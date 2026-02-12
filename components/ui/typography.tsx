@@ -13,6 +13,22 @@ export function H1({ children, className }: Typography) {
   return <h1 className={classes}>{children}</h1>;
 }
 
+export function H2({ children, className }: Typography) {
+  const classes = clsx(
+    "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
+    className,
+  );
+  return <h2 className={classes}>{children}</h2>;
+}
+
+export function H3({ children, className }: Typography) {
+  const classes = clsx(
+    "scroll-m-20 text-2xl font-semibold tracking-tight",
+    className,
+  );
+  return <h3 className={classes}>{children}</h3>;
+}
+
 interface PProps extends Typography {
   isSubtext?: boolean;
 }

@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body>
+      <body className="flex flex-col gap-4">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

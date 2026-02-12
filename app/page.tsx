@@ -1,5 +1,9 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { H1, P } from '@/components/ui/typography';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { H1, H2, H3, P } from '@/components/ui/typography';
+import { ArrowUpIcon, Plus } from 'lucide-react';
 
 export default function Page() {
   return (
@@ -13,6 +17,61 @@ export default function Page() {
         <Avatar size="lg">
           <AvatarFallback>SF</AvatarFallback>
         </Avatar>
+      </div>
+
+      <div className="px-4">
+        <Table>
+          <TableBody>
+            <TableRow>
+              <TableCell>
+                <P>Income</P>
+              </TableCell>
+              <TableCell className="text-right">
+                <P>£1,234</P>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <P>Ougoings</P>
+              </TableCell>
+              <TableCell className="text-right">
+                <P>£1,234</P>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>
+                <H3>Still to pay</H3>
+              </TableCell>
+              <TableCell className="text-right">
+                <H3>£1,234</H3>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="px-4">
+        <div className="flex justify-between">
+          <H3 className="pb-2 px-2">Income</H3>
+          <Button variant="ghost" size="icon">
+            <Plus />
+          </Button>
+        </div>
+        <Card className="p-0">
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell className="px-4">
+                  <P>Work</P>
+                  <P isSubtext>Monthly</P>
+                </TableCell>
+                <TableCell className="px-4 text-right">
+                  <H3>£2,120</H3>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Card>
       </div>
     </>
   );
