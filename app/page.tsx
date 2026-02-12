@@ -52,9 +52,9 @@ export default function Page() {
       </div>
 
       <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-end">
+        <div className="flex justify-between pl-2 pb-2 items-center">
           <H3>Income</H3>
-          <Button variant="outline" size="icon-lg">
+          <Button variant="ghost" size="icon-lg">
             <Plus />
           </Button>
         </div>
@@ -85,9 +85,9 @@ export default function Page() {
       </div>
 
       <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-end">
+        <div className="flex justify-between pl-2 pb-2 items-center">
           <H3>Outgoings</H3>
-          <Button variant="outline" size="icon-lg">
+          <Button variant="ghost" size="icon-lg">
             <Plus />
           </Button>
         </div>
