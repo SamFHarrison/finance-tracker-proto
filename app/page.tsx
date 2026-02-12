@@ -1,10 +1,10 @@
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { H1, H2, H3, P } from '@/components/ui/typography';
-import { ArrowUpIcon, Plus } from 'lucide-react';
+import { H1, H3, P } from '@/components/ui/typography';
+import { Plus } from 'lucide-react';
 
 export default function Page() {
   return (
@@ -86,7 +86,7 @@ export default function Page() {
           <Table>
             <TableBody>
               <TableRow>
-                <TableCell className="w-9">
+                <TableCell className="w-10">
                   <Checkbox />
                 </TableCell>
                 <TableCell>
