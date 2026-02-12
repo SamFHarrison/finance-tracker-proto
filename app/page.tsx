@@ -51,9 +51,9 @@ export default function Page() {
       </div>
 
       <div className="px-4">
-        <div className="flex justify-between">
-          <H3 className="pb-2 px-2">Income</H3>
-          <Button variant="ghost" size="icon">
+        <div className="flex justify-between pl-2 pb-2 items-end">
+          <H3>Income</H3>
+          <Button variant="outline" size="icon-lg">
             <Plus />
           </Button>
         </div>
