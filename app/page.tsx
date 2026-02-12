@@ -70,6 +70,15 @@ export default function Page() {
                   <H3>£2,120</H3>
                 </TableCell>
               </TableRow>
+              <TableRow>
+                <TableCell>
+                  <P>Side Hustle</P>
+                  <P isSubtext>Additional income</P>
+                </TableCell>
+                <TableCell className="text-right">
+                  <H3>£120</H3>
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </Card>
@@ -95,6 +104,18 @@ export default function Page() {
                 </TableCell>
                 <TableCell className="text-right">
                   <H3>£720</H3>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="w-10">
+                  <Checkbox />
+                </TableCell>
+                <TableCell>
+                  <P>Car</P>
+                  <P isSubtext>13th</P>
+                </TableCell>
+                <TableCell className="text-right">
+                  <H3>£320</H3>
                 </TableCell>
               </TableRow>
             </TableBody>
