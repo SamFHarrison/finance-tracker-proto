@@ -77,7 +77,7 @@ export default function Page() {
 
       <div className="px-4">
         <div className="flex justify-between pl-2 pb-2 items-end">
-          <H3>Income</H3>
+          <H3>Outgoings</H3>
           <Button variant="outline" size="icon-lg">
             <Plus />
           </Button>
@@ -90,11 +90,11 @@ export default function Page() {
                   <Checkbox />
                 </TableCell>
                 <TableCell>
-                  <P>Work</P>
-                  <P isSubtext>Monthly</P>
+                  <P>Rent</P>
+                  <P isSubtext>1st</P>
                 </TableCell>
                 <TableCell className="text-right">
-                  <H3>£2,120</H3>
+                  <H3>£720</H3>
                 </TableCell>
               </TableRow>
             </TableBody>
