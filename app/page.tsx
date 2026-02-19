@@ -1,9 +1,17 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { H1, H3, P } from '@/components/ui/typography';
+import {
+  Avatar,
+  AvatarFallback,
+  Button,
+  Card,
+  Checkbox,
+  H1,
+  H3,
+  P,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow
+} from '@/components/ui/primitives';
 import { Plus } from 'lucide-react';
 
 export default function Page() {
