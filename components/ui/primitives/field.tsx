@@ -3,7 +3,7 @@
 import { Label } from "@/components/ui/primitives/label";
 import { Separator } from "@/components/ui/primitives/separator";
 import { cn } from "@/lib/utils/cn";
-import { cva, type, VariantProps } from "class-variance-authority";
+import { cva, VariantProps } from "class-variance-authority";
 import { useMemo } from "react";
 
 function FieldSet({ className, ...props }: React.ComponentProps<"fieldset">) {
