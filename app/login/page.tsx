@@ -10,7 +10,7 @@ import {
   P,
 } from "@/components/ui/primitives";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default async function LoginPage() {
@@ -18,8 +18,6 @@ export default async function LoginPage() {
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
-  const search = await useSearchParams();
-  const next = search.get("next") || "/";
 
   const supabase = createClient();
 
@@ -35,7 +33,6 @@ export default async function LoginPage() {
     console.log("data", data);
 
     if (error) return setErr(error.message);
-    router.push(next);
   }
 
   return (
