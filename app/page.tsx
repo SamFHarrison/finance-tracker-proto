@@ -11,18 +11,27 @@ import {
   TableBody,
   TableCell,
   TableRow,
-} from "@/components/ui/primitives";
-import { createClient } from "@/lib/supabase/client";
+} from "@/components/ui";
+import { createClient } from "@/lib/supabase/server";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { formatDayOrdinal } from "@/lib/utils/formatDayOrdinal";
 import { MOCK_CURRENT_BUDGET_PAGE, MOCK_CURRENT_SUMMARY } from "@/mocks/user";
 import { Plus } from "lucide-react";
+import { redirect } from "next/navigation";
+
+async function UserDetails() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.getClaims();
+
+  if (error || !data?.claims) {
+    redirect("/auth/login");
+  }
+
+  return data.claims;
+}
 
 export default async function Page() {
-  const supabase = createClient();
-  const user = await supabase.auth.getClaims();
-
-  console.log("user", user);
+  const user = await UserDetails();
 
   const { still_to_pay_pence, expense_total_pence, income_total_pence } =
     MOCK_CURRENT_SUMMARY;
