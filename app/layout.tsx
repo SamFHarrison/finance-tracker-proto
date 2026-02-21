@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { ThemeProvider } from '@/components/providers/ThemeProvider';
-import { Inter } from 'next/font/google';
-import './globals.css';
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { Inter } from "next/font/google";
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="flex flex-col gap-8 pt-4">
+      <body className="flex flex-col gap-8 pt-4 h-dvh">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
