@@ -13,12 +13,12 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-export default function LoginPage() {
+export default async function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const router = useRouter();
-  const search = useSearchParams();
+  const search = await useSearchParams();
   const next = search.get("next") || "/";
 
   const supabase = createClient();
