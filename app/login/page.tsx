@@ -32,6 +32,8 @@ export default function LoginPage() {
       password,
     });
 
+    console.log("data", data);
+
     if (error) return setErr(error.message);
     router.push(next);
   }

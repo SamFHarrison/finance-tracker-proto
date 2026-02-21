@@ -12,12 +12,18 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui/primitives";
+import { createClient } from "@/lib/supabase/client";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { formatDayOrdinal } from "@/lib/utils/formatDayOrdinal";
 import { MOCK_CURRENT_BUDGET_PAGE, MOCK_CURRENT_SUMMARY } from "@/mocks/user";
 import { Plus } from "lucide-react";
 
-export default function Page() {
+export default async function Page() {
+  const supabase = createClient();
+  const user = await supabase.auth.getClaims();
+
+  console.log("user", user);
+
   const { still_to_pay_pence, expense_total_pence, income_total_pence } =
     MOCK_CURRENT_SUMMARY;
   const { expenses, income } = MOCK_CURRENT_BUDGET_PAGE;
