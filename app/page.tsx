@@ -32,6 +32,7 @@ async function UserDetails() {
 
 export default async function Page() {
   const user = await UserDetails();
+  console.log("user", user);
 
   const { still_to_pay_pence, expense_total_pence, income_total_pence } =
     MOCK_CURRENT_SUMMARY;
