@@ -17,7 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <body className="flex flex-col gap-8 pt-4 h-dvh">
+      <body
+        className="flex flex-col gap-8 pt-4 h-dvh overflow-y-scroll
+"
+      >
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

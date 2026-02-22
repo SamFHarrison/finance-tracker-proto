@@ -1,12 +1,12 @@
-import clsx from 'clsx';
-import { PropsWithChildren } from 'react';
+import { cn } from "@/lib/utils/cn";
+import { PropsWithChildren } from "react";
 
 interface Typography extends PropsWithChildren {
   className?: string;
 }
 
 export function H1({ children, className }: Typography) {
-  const classes = clsx(
+  const classes = cn(
     "scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance",
     className,
   );
@@ -14,7 +14,7 @@ export function H1({ children, className }: Typography) {
 }
 
 export function H2({ children, className }: Typography) {
-  const classes = clsx(
+  const classes = cn(
     "scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0",
     className,
   );
@@ -22,7 +22,7 @@ export function H2({ children, className }: Typography) {
 }
 
 export function H3({ children, className }: Typography) {
-  const classes = clsx(
+  const classes = cn(
     "scroll-m-20 text-2xl font-semibold tracking-tight",
     className,
   );
@@ -34,7 +34,7 @@ interface PProps extends Typography {
 }
 
 export function P({ className, children, isSubtext }: PProps) {
-  const classes = clsx({
+  const classes = cn({
     "leading-7 [&:not(:first-child)]:mt-6": !isSubtext,
     "text-muted-foreground text-sm": isSubtext,
     className,

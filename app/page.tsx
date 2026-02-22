@@ -1,6 +1,5 @@
+import { getUserDetailsOnServer } from "@/components/getUserDetails";
 import {
-  Avatar,
-  AvatarFallback,
   Button,
   Card,
   Checkbox,
@@ -12,29 +11,13 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui";
-import { createClient } from "@/lib/supabase/server";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { formatDayOrdinal } from "@/lib/utils/formatDayOrdinal";
 import { MOCK_CURRENT_BUDGET_PAGE, MOCK_CURRENT_SUMMARY } from "@/mocks/user";
-import { Plus } from "lucide-react";
-import { redirect } from "next/navigation";
-
-async function UserDetails() {
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.getClaims();
-
-  if (error || !data?.claims) {
-    redirect("/auth/login");
-  }
-
-  return data.claims;
-}
+import { Plus, ThumbsUp } from "lucide-react";
 
 export default async function Page() {
-  await UserDetails();
-
-  const supabase = await createClient();
-  const { data: profileData } = await supabase.from("profiles").select();
+  await getUserDetailsOnServer();
 
   const { still_to_pay_pence, expense_total_pence, income_total_pence } =
     MOCK_CURRENT_SUMMARY;
@@ -48,9 +31,11 @@ export default async function Page() {
           <H1>February</H1>
         </div>
 
-        <Avatar size="lg">
-          <AvatarFallback>SF</AvatarFallback>
-        </Avatar>
+        {/* <Link href="/settings">
+          <Button variant="outline" size="icon-lg">
+            <SettingsIcon />
+          </Button>
+        </Link> */}
       </div>
 
       <div className="px-4">
@@ -147,6 +132,11 @@ export default async function Page() {
             </TableBody>
           </Table>
         </Card>
+      </div>
+
+      <div className="flex flex-col w-full items-center text-muted-foreground gap-1 px-4 pb-40 pt-10">
+        <ThumbsUp />
+        <P isSubtext>That's all</P>
       </div>
     </>
   );
