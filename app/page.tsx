@@ -3,14 +3,28 @@ import {
   Button,
   Card,
   Checkbox,
+  Field,
+  FieldGroup,
   H1,
   H3,
+  Input,
+  Label,
   P,
   Table,
   TableBody,
   TableCell,
   TableRow,
 } from "@/components/ui";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { formatDayOrdinal } from "@/lib/utils/formatDayOrdinal";
 import { MOCK_CURRENT_BUDGET_PAGE, MOCK_CURRENT_SUMMARY } from "@/mocks/user";
@@ -72,10 +86,57 @@ export default async function Page() {
       <div className="px-4">
         <div className="flex justify-between pl-2 pb-2 items-center">
           <H3>Income</H3>
-          <Button variant="ghost" size="icon-lg">
-            <Plus />
-          </Button>
+
+          <Dialog>
+            <DialogTrigger
+              render={
+                <Button variant="ghost" size="icon-lg">
+                  <Plus />
+                </Button>
+              }
+            />
+            <DialogPortal>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add income</DialogTitle>
+                </DialogHeader>
+
+                <FieldGroup>
+                  <Field>
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" name="name" />
+                  </Field>
+
+                  <Field>
+                    <Label htmlFor="amount">Amount</Label>
+                    <Input
+                      id="amount"
+                      name="amount"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      inputMode="decimal"
+                    />
+                  </Field>
+
+                  <Field className="flex-row">
+                    <Label htmlFor="isMonthly">
+                      Add this income every month
+                    </Label>
+                    <Switch id="isMonthly" />
+                  </Field>
+                </FieldGroup>
+
+                <DialogFooter className="flex-row">
+                  <Button type="submit" className="w-full">
+                    Save
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </DialogPortal>
+          </Dialog>
         </div>
+
         <Card className="py-0 px-2">
           <Table>
             <TableBody>
