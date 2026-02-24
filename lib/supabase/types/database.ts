@@ -7,10 +7,30 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
@@ -128,8 +148,10 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          current_period_start: string | null
           display_name: string | null
           month_start_day: number
+          next_month_start_day: number | null
           preferred_app_theme: Database["public"]["Enums"]["app_theme"]
           preferred_currency: string
           updated_at: string
@@ -137,8 +159,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          current_period_start?: string | null
           display_name?: string | null
           month_start_day?: number
+          next_month_start_day?: number | null
           preferred_app_theme?: Database["public"]["Enums"]["app_theme"]
           preferred_currency?: string
           updated_at?: string
@@ -146,8 +170,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          current_period_start?: string | null
           display_name?: string | null
           month_start_day?: number
+          next_month_start_day?: number | null
           preferred_app_theme?: Database["public"]["Enums"]["app_theme"]
           preferred_currency?: string
           updated_at?: string
@@ -219,6 +245,26 @@ export type Database = {
         SetofOptions: {
           from: "*"
           to: "budgets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_month_start_day_next_cycle: {
+        Args: { p_new_start_day: number }
+        Returns: {
+          created_at: string
+          current_period_start: string | null
+          display_name: string | null
+          month_start_day: number
+          next_month_start_day: number | null
+          preferred_app_theme: Database["public"]["Enums"]["app_theme"]
+          preferred_currency: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -357,6 +403,9 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {
       app_theme: ["system", "light", "dark"],
@@ -370,3 +419,4 @@ export const Constants = {
     },
   },
 } as const
+

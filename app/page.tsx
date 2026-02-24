@@ -1,41 +1,39 @@
+import AddIncome from "@/components/blocks/add-income";
 import { getUserDetailsOnServer } from "@/components/getUserDetails";
 import {
   Button,
   Card,
   Checkbox,
-  Field,
-  FieldGroup,
   H1,
   H3,
-  Input,
-  Label,
   P,
   Table,
   TableBody,
   TableCell,
   TableRow,
 } from "@/components/ui";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Switch } from "@/components/ui/switch";
+import { createClient } from "@/lib/supabase/server";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { formatDayOrdinal } from "@/lib/utils/formatDayOrdinal";
-import { MOCK_CURRENT_BUDGET_PAGE, MOCK_CURRENT_SUMMARY } from "@/mocks/user";
 import { Plus, ThumbsUp } from "lucide-react";
 
 export default async function Page() {
   await getUserDetailsOnServer();
 
-  const { still_to_pay_pence, expense_total_pence, income_total_pence } =
-    MOCK_CURRENT_SUMMARY;
-  const { expenses, income } = MOCK_CURRENT_BUDGET_PAGE;
+  const supabase = await createClient();
+  const { data: budgetData, error: budgetError } = await supabase.rpc(
+    "get_or_create_budget",
+  );
+  // TODO: Error handling
+  if (budgetError) return;
+
+  const { data: budgetSummaryData, error: budgetSummaryError } = await supabase
+    .from("budget_summary")
+    .select("income_total_pence")
+    .eq("budget_id", budgetData.id);
+  // TODO: Error handling
+  if (budgetSummaryError || budgetSummaryData.length > 1) return;
+  const budgetSummary = budgetSummaryData[0].income_total_pence;
 
   return (
     <>
@@ -60,7 +58,11 @@ export default async function Page() {
                 <P>Income</P>
               </TableCell>
               <TableCell className="text-right">
-                <P>{formatCurrencyFromMinorUnits(income_total_pence)}</P>
+                <P>
+                  {/* {formatCurrencyFromMinorUnits(
+                    budgetSummary.income_total_pence,
+                  )} */}
+                </P>
               </TableCell>
             </TableRow>
             <TableRow>
@@ -68,7 +70,11 @@ export default async function Page() {
                 <P>Ougoings</P>
               </TableCell>
               <TableCell className="text-right">
-                <P>{formatCurrencyFromMinorUnits(expense_total_pence)}</P>
+                <P>
+                  {/* {formatCurrencyFromMinorUnits(
+                    budgetSummary.expense_total_pence,
+                  )} */}
+                </P>
               </TableCell>
             </TableRow>
             <TableRow>
@@ -76,7 +82,9 @@ export default async function Page() {
                 <H3>Still to pay</H3>
               </TableCell>
               <TableCell className="text-right">
-                <H3>{formatCurrencyFromMinorUnits(still_to_pay_pence)}</H3>
+                <H3>
+                  {/* {formatCurrencyFromMinorUnits(still_to_pay_pence)} */}
+                </H3>
               </TableCell>
             </TableRow>
           </TableBody>
@@ -87,60 +95,17 @@ export default async function Page() {
         <div className="flex justify-between pl-2 pb-2 items-center">
           <H3>Income</H3>
 
-          <Dialog>
-            <DialogTrigger
-              render={
-                <Button variant="ghost" size="icon-lg">
-                  <Plus />
-                </Button>
-              }
-            />
-            <DialogPortal>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add income</DialogTitle>
-                </DialogHeader>
+          {/* <Button variant="ghost" size="icon-lg">
+            <Plus />
+          </Button> */}
 
-                <FieldGroup>
-                  <Field>
-                    <Label htmlFor="name">Name</Label>
-                    <Input id="name" name="name" />
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="amount">Amount</Label>
-                    <Input
-                      id="amount"
-                      name="amount"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      inputMode="decimal"
-                    />
-                  </Field>
-
-                  <Field className="flex-row">
-                    <Label htmlFor="isMonthly">
-                      Add this income every month
-                    </Label>
-                    <Switch id="isMonthly" />
-                  </Field>
-                </FieldGroup>
-
-                <DialogFooter className="flex-row">
-                  <Button type="submit" className="w-full">
-                    Save
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </DialogPortal>
-          </Dialog>
+          <AddIncome />
         </div>
 
         <Card className="py-0 px-2">
           <Table>
             <TableBody>
-              {income.map((income, idx) => {
+              {/* {income.map((income, idx) => {
                 return (
                   <TableRow key={idx}>
                     <TableCell>
@@ -156,7 +121,7 @@ export default async function Page() {
                     </TableCell>
                   </TableRow>
                 );
-              })}
+              })} */}
             </TableBody>
           </Table>
         </Card>
@@ -172,7 +137,7 @@ export default async function Page() {
         <Card className="py-0 px-2">
           <Table>
             <TableBody>
-              {expenses.map((expense, idx) => {
+              {/* {expenses.map((expense, idx) => {
                 return (
                   <TableRow key={idx}>
                     <TableCell className="w-10">
@@ -189,7 +154,7 @@ export default async function Page() {
                     </TableCell>
                   </TableRow>
                 );
-              })}
+              })} */}
             </TableBody>
           </Table>
         </Card>

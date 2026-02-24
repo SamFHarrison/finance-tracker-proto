@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import ClientSideProviders from "@/components/providers/ClientSideProviders";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -21,7 +22,9 @@ export default function RootLayout({
         className="flex flex-col gap-8 pt-4 h-dvh overflow-y-scroll
 "
       >
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ClientSideProviders>{children}</ClientSideProviders>
+        </ThemeProvider>
       </body>
     </html>
   );
