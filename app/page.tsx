@@ -145,8 +145,15 @@ export default function Page() {
           <Table>
             <TableBody>
               {income &&
+                budgetId &&
                 income.map((income) => {
-                  return <IncomeTableRow key={income.id} income={income} />;
+                  return (
+                    <IncomeTableRow
+                      key={income.id}
+                      income={income}
+                      budgetId={budgetId}
+                    />
+                  );
                 })}
             </TableBody>
           </Table>
