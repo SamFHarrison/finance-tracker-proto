@@ -3,7 +3,6 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientSideProviders from "@/components/providers/ClientSideProviders";
-import { getUserDetailsOnServer } from "@/lib/api/user.server";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -17,8 +16,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await getUserDetailsOnServer();
-
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body
