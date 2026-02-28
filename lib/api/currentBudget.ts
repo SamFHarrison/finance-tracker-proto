@@ -1,8 +1,20 @@
 import { createClient } from "@/lib/supabase/client";
-import { Database } from "../supabase/types/database";
+import { CurrentBudget, CurrentBudgetReturn } from "../types/appTypes";
 
-export type CurrentBudget =
-  Database["public"]["Functions"]["get_or_create_budget"]["Returns"];
+function toCurrentBudgetStrict(
+  data: CurrentBudgetReturn | null,
+): CurrentBudget {
+  if (!data?.id || !data.user_id || !data.period_start) {
+    throw new Error("current_budget result missing required identifiers");
+  }
+
+  return {
+    ...data,
+    id: data.id,
+    user_id: data.user_id,
+    period_start: data.period_start,
+  };
+}
 
 export async function getCurrentBudget(
   p_date?: string,
@@ -13,5 +25,5 @@ export async function getCurrentBudget(
     p_date ? { p_date } : {},
   );
   if (error) throw error;
-  return data;
+  return toCurrentBudgetStrict(data);
 }

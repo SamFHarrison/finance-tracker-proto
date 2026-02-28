@@ -1,17 +1,11 @@
-export type AppTheme = "system" | "light" | "dark";
-export type ExpenseCategory =
-  | "essential"
-  | "debt"
-  | "luxuries"
-  | "variable"
-  | "savings_and_investments";
+import { Database } from "../supabase/types/database";
 
 export type Profile = {
   user_id: string;
   display_name: string | null;
   preferred_currency: "GBP";
   month_start_day: number; // 1-31
-  preferred_app_theme: AppTheme;
+  preferred_app_theme: Database["public"]["Enums"]["app_theme"];
   created_at: string; // ISO
   updated_at: string; // ISO
 };
@@ -38,7 +32,7 @@ export type Expense = {
   created_at: string; // ISO
   name: string;
   amount_pence: number;
-  category: ExpenseCategory;
+  category: Database["public"]["Enums"]["expense_category"];
   payment_date: string; // YYYY-MM-DD
   is_paid: boolean;
 };

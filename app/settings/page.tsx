@@ -1,4 +1,4 @@
-import { getUserDetailsOnServer } from "@/components/getUserDetails";
+import { getUserDetailsOnServer } from "@/lib/api/user.server";
 import { H1, P } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
 

@@ -1,4 +1,5 @@
 import { BudgetSummaryRow } from "../supabase/types/types";
+import { Database } from "../supabase/types/database";
 
 export type BudgetSummary = Omit<
   BudgetSummaryRow,
@@ -30,4 +31,16 @@ export type BudgetSummary = Omit<
   needs_pct_of_income: number | null;
   wants_pct_of_income: number | null;
   savings_pct_of_income: number | null;
+};
+
+export type CurrentBudgetReturn =
+  Database["public"]["Functions"]["get_or_create_budget"]["Returns"];
+
+export type CurrentBudget = Omit<
+  CurrentBudgetReturn,
+  "id" | "user_id" | "period_start"
+> & {
+  id: string;
+  user_id: string;
+  period_start: string;
 };

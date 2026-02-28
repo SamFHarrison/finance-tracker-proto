@@ -1,4 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
 import {
   Dialog,
   DialogContent,
@@ -11,18 +12,15 @@ import {
 import { Plus } from "lucide-react";
 import { Button, Field, FieldGroup, Input, Label } from "../ui";
 import { Switch } from "../ui/switch";
+import { useCreateIncome } from "@/lib/hooks/useCreateIncome";
+import { useState } from "react";
 
-export default async function addIncome() {
-  const supabase = await createClient();
+export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
+  const createIncome = useCreateIncome(budgetId);
 
-  const { data: budget, error: RPCError } = await supabase.rpc(
-    "get_or_create_budget",
-  );
-  if (RPCError) return;
-
-  const { error } = await supabase
-    .from("income")
-    .insert({ amount_pence: 15000, name: "Rent", budget_id: budget?.id });
+  const [name, setName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [isMonthly, setIsMonthly] = useState(false);
 
   return (
     <Dialog>
@@ -39,35 +37,61 @@ export default async function addIncome() {
             <DialogTitle>Add income</DialogTitle>
           </DialogHeader>
 
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" name="name" />
-            </Field>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
 
-            <Field>
-              <Label htmlFor="amount">Amount</Label>
-              <Input
-                id="amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                inputMode="decimal"
-              />
-            </Field>
+              createIncome.mutate({
+                budget_id: budgetId,
+                name,
+                amount_pence: Number(amount),
+                is_monthly: isMonthly,
+              });
+            }}
+          >
+            <FieldGroup>
+              <Field>
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </Field>
 
-            <Field className="flex-row">
-              <Label htmlFor="isMonthly">Add this income every month</Label>
-              <Switch id="isMonthly" />
-            </Field>
-          </FieldGroup>
+              <Field>
+                <Label htmlFor="amount">Amount</Label>
+                <Input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                />
+              </Field>
 
-          <DialogFooter className="flex-row">
-            <Button type="submit" className="w-full">
-              Save
-            </Button>
-          </DialogFooter>
+              <Field className="flex-row">
+                <Label htmlFor="isMonthly">Add this income every month</Label>
+                <Switch
+                  id="isMonthly"
+                  checked={isMonthly}
+                  onCheckedChange={() => setIsMonthly(!isMonthly)}
+                />
+              </Field>
+            </FieldGroup>
+
+            <DialogFooter className="flex-row">
+              <Button type="submit" className="w-full mt-4">
+                Save
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </DialogPortal>
     </Dialog>
