@@ -1,3 +1,5 @@
+import { escapeRegExp } from "./escapeRegEx";
+
 /**
  * Parse a human-entered money string into an integer amount in **minor units** (e.g. pence).
  *

@@ -14,8 +14,6 @@ export default async function Settings() {
     return <p>There was an error</p>;
   }
 
-  const profile = profileData[0];
-
   return (
     <>
       <div className="flex px-4 justify-between items-end">
