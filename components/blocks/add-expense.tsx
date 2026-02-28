@@ -5,7 +5,6 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogPortal,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
@@ -36,6 +35,7 @@ import { computePaymentDateForCycle } from "@/lib/utils/calculateExpensePaymentD
 import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
 import { useUserId } from "@/lib/hooks/useUserId";
+import { Spinner } from "../ui/spinner";
 
 export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
   const { data: budget } = useCurrentBudget();
@@ -43,13 +43,21 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
   const { data: profile } = useGetProfile(userId);
   const createExpense = useCreateExpense(budgetId);
 
+  const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentDay, setPaymentDay] = useState(1);
   const [category, setCategory] = useState<ExpenseCategory>("essential");
 
+  const resetForm = () => {
+    setName("");
+    setAmount("");
+    setPaymentDay(1);
+    setCategory("essential");
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
           <Button variant="ghost" size="icon-lg">
@@ -57,19 +65,19 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
           </Button>
         }
       />
-      <DialogPortal>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add expense</DialogTitle>
-          </DialogHeader>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Add expense</DialogTitle>
+        </DialogHeader>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
 
-              if (!budget || !profile) return;
+            if (!budget || !profile) return;
 
-              createExpense.mutate({
+            createExpense.mutate(
+              {
                 budget_id: budgetId,
                 name: name,
                 amount_pence: Number(amount),
@@ -80,101 +88,119 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
                   paymentDay: paymentDay,
                 }),
                 is_paid: false,
-              });
-            }}
-          >
-            <FieldGroup>
-              <Field>
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </Field>
+              },
+              {
+                onSuccess: () => {
+                  resetForm();
+                  setOpen(false);
+                },
+              },
+            );
+          }}
+        >
+          <FieldGroup>
+            <Field>
+              <Label htmlFor="expense-name">Name</Label>
+              <Input
+                id="expense-name"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={createExpense.isPending}
+                required
+              />
+            </Field>
 
-              <Field>
-                <Label htmlFor="amount">Amount</Label>
-                <Input
-                  id="amount"
-                  name="amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  inputMode="decimal"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                />
-              </Field>
+            <Field>
+              <Label htmlFor="expense-amount">Amount</Label>
+              <Input
+                id="expense-amount"
+                name="amount"
+                type="number"
+                step="0.01"
+                min="0"
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                disabled={createExpense.isPending}
+                required
+              />
+            </Field>
 
-              <Field>
-                <div>
-                  <Label className="flex-col items-start">
-                    Payment day
-                    <P isSubtext>
-                      If this day doesn't exist, we'll use the last day of the
-                      month.
-                    </P>
-                  </Label>
-                </div>
-                <Select
-                  items={dayOptions}
-                  value={paymentDay}
-                  onValueChange={(value) => setPaymentDay(Number(value))}
-                  required
+            <Field>
+              <div>
+                <Label className="flex-col items-start">
+                  Payment day
+                  <P isSubtext>
+                    If this day doesn&apos;t exist, we&apos;ll use the last day
+                    of the month.
+                  </P>
+                </Label>
+              </div>
+              <Select
+                items={dayOptions}
+                value={paymentDay}
+                onValueChange={(value) => setPaymentDay(Number(value))}
+                disabled={createExpense.isPending}
+                required
+              >
+                <SelectTrigger className="w-full max-w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Days of the month</SelectLabel>
+                    {dayOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+
+            <Field>
+              <Label htmlFor="expense-category">Category</Label>
+              <Select
+                items={CategorySelectOptions}
+                value={category}
+                onValueChange={(value) => setCategory(value as ExpenseCategory)}
+                disabled={createExpense.isPending}
+                required
+              >
+                <SelectTrigger
+                  id="expense-category"
+                  className="w-full max-w-48"
                 >
-                  <SelectTrigger className="w-full max-w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Days of the month</SelectLabel>
-                      {dayOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </Field>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Categories</SelectLabel>
+                    {CategorySelectOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+          </FieldGroup>
 
-              <Field>
-                <Label htmlFor="category">Category</Label>
-                <Select
-                  items={CategorySelectOptions}
-                  value={category}
-                  onValueChange={(value) => setCategory(value as ExpenseCategory)}
-                  required
-                >
-                  <SelectTrigger className="w-full max-w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Categories</SelectLabel>
-                      {CategorySelectOptions.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </Field>
-            </FieldGroup>
-
-            <DialogFooter className="flex-row">
-              <Button type="submit" className="w-full mt-4">
-                Save
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </DialogPortal>
+          <DialogFooter className="flex-row">
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              disabled={createExpense.isPending}
+            >
+              {createExpense.isPending && <Spinner />}
+              {createExpense.isPending ? "Saving..." : "Save"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
