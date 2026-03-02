@@ -14,6 +14,10 @@ import {
   Field,
   FieldGroup,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Label,
   P,
   Select,
@@ -36,6 +40,7 @@ import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
 import { useUserId } from "@/lib/hooks/useUserId";
 import { Spinner } from "../ui/spinner";
+import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 
 export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
   const { data: budget } = useCurrentBudget();
@@ -75,12 +80,14 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
             e.preventDefault();
 
             if (!budget || !profile) return;
+            const amountPence = parseCurrencyToMinorUnits(amount);
+            if (amountPence === null) return;
 
             createExpense.mutate(
               {
                 budget_id: budgetId,
                 name: name,
-                amount_pence: Number(amount),
+                amount_pence: amountPence,
                 category: category,
                 payment_date: computePaymentDateForCycle({
                   periodStart: budget.period_start,
@@ -113,18 +120,26 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
 
             <Field>
               <Label htmlFor="expense-amount">Amount</Label>
-              <Input
-                id="expense-amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                disabled={createExpense.isPending}
-                required
-              />
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText className="text-base font-normal">
+                    £
+                  </InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="expense-amount"
+                  name="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  disabled={createExpense.isPending}
+                  required
+                />
+              </InputGroup>
             </Field>
 
             <Field>

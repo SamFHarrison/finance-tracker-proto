@@ -9,11 +9,22 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Plus } from "lucide-react";
-import { Button, Field, FieldGroup, Input, Label } from "../ui";
+import {
+  Button,
+  Field,
+  FieldGroup,
+  Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
+  Label,
+} from "../ui";
 import { Switch } from "../ui/switch";
 import { useCreateIncome } from "@/lib/hooks/useCreateIncome";
 import { useState } from "react";
 import { Spinner } from "../ui/spinner";
+import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 
 export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
   const createIncome = useCreateIncome(budgetId);
@@ -47,11 +58,14 @@ export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
           onSubmit={(e) => {
             e.preventDefault();
 
+            const amountPence = parseCurrencyToMinorUnits(amount);
+            if (amountPence === null) return;
+
             createIncome.mutate(
               {
                 budget_id: budgetId,
                 name,
-                amount_pence: Number(amount),
+                amount_pence: amountPence,
                 is_monthly: isMonthly,
               },
               {
@@ -70,6 +84,7 @@ export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
                 id="income-name"
                 name="name"
                 value={name}
+                placeholder="Rent"
                 onChange={(e) => setName(e.target.value)}
                 disabled={createIncome.isPending}
                 required
@@ -78,18 +93,26 @@ export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
 
             <Field>
               <Label htmlFor="income-amount">Amount</Label>
-              <Input
-                id="income-amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                disabled={createIncome.isPending}
-                required
-              />
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText className="text-base font-normal">
+                    £
+                  </InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="income-amount"
+                  name="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  disabled={createIncome.isPending}
+                  required
+                />
+              </InputGroup>
             </Field>
 
             <Field className="flex-row">

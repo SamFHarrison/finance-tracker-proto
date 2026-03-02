@@ -6,6 +6,10 @@ import {
   FieldGroup,
   H3,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Label,
   P,
   TableCell,
@@ -26,6 +30,8 @@ import { Spinner } from "../ui/spinner";
 import { Switch } from "../ui/switch";
 import { useMutateIncome } from "@/lib/hooks/useMutateIncome";
 import { useDeleteIncome } from "@/lib/hooks/useDeleteIncome";
+import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
+import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
 
 type IncomeTableRowProps = {
   income: IncomeRow;
@@ -41,14 +47,16 @@ export default function IncomeTableRow({
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(income.name);
-  const [amount, setAmount] = useState(income.amount_pence);
+  const [amount, setAmount] = useState(
+    formatMinorUnitsForInput(income.amount_pence),
+  );
   const [isMonthly, setIsMonthly] = useState(income.is_monthly);
 
   const isPending = mutateIncome.isPending || deleteIncome.isPending;
 
   const resetForm = () => {
     setName(income.name);
-    setAmount(income.amount_pence);
+    setAmount(formatMinorUnitsForInput(income.amount_pence));
     setIsMonthly(income.is_monthly);
   };
 
@@ -91,12 +99,15 @@ export default function IncomeTableRow({
           onSubmit={(e) => {
             e.preventDefault();
 
+            const amountPence = parseCurrencyToMinorUnits(amount);
+            if (amountPence === null) return;
+
             mutateIncome.mutate(
               {
                 incomeId: income.id,
                 patch: {
                   name,
-                  amount_pence: Number(amount),
+                  amount_pence: amountPence,
                   is_monthly: isMonthly,
                 },
               },
@@ -123,18 +134,26 @@ export default function IncomeTableRow({
 
             <Field>
               <Label htmlFor="income-amount">Amount</Label>
-              <Input
-                id="income-amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
-                disabled={isPending}
-                required
-              />
+
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText className="text-base font-normal">
+                    £
+                  </InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="income-amount"
+                  name="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  disabled={isPending}
+                />
+              </InputGroup>
             </Field>
 
             <Field className="flex-row">

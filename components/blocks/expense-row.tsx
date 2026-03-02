@@ -8,6 +8,10 @@ import {
   FieldGroup,
   H3,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Label,
   P,
   Select,
@@ -44,6 +48,8 @@ import {
 } from "../ui/dialog";
 import { Spinner } from "../ui/spinner";
 import { Switch } from "../ui/switch";
+import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
+import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
 
 type ExpenseTableRowProps = {
   budgetId: string;
@@ -63,7 +69,9 @@ export default function ExpenseTableRow({
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(expense.name);
-  const [amount, setAmount] = useState(String(expense.amount_pence));
+  const [amount, setAmount] = useState(
+    formatMinorUnitsForInput(expense.amount_pence),
+  );
   const [paymentDay, setPaymentDay] = useState(
     Number(expense.payment_date.slice(-2)),
   );
@@ -78,7 +86,7 @@ export default function ExpenseTableRow({
 
   const resetForm = () => {
     setName(expense.name);
-    setAmount(String(expense.amount_pence));
+    setAmount(formatMinorUnitsForInput(expense.amount_pence));
     setPaymentDay(Number(expense.payment_date.slice(-2)));
     setCategory(expense.category);
     setIsPaid(expense.is_paid);
@@ -139,13 +147,15 @@ export default function ExpenseTableRow({
             e.preventDefault();
 
             if (!budget || !profile) return;
+            const amountPence = parseCurrencyToMinorUnits(amount);
+            if (amountPence === null) return;
 
             mutateExpense.mutate(
               {
                 expenseId: expense.id,
                 patch: {
                   name,
-                  amount_pence: Number(amount),
+                  amount_pence: amountPence,
                   category,
                   payment_date: computePaymentDateForCycle({
                     periodStart: budget.period_start,
@@ -178,18 +188,26 @@ export default function ExpenseTableRow({
 
             <Field>
               <Label htmlFor="expense-amount">Amount</Label>
-              <Input
-                id="expense-amount"
-                name="amount"
-                type="number"
-                step="0.01"
-                min="0"
-                inputMode="decimal"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                disabled={isPending}
-                required
-              />
+
+              <InputGroup>
+                <InputGroupAddon>
+                  <InputGroupText className="text-base font-normal">
+                    £
+                  </InputGroupText>
+                </InputGroupAddon>
+                <InputGroupInput
+                  id="expense-amount"
+                  name="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  inputMode="decimal"
+                  placeholder="0.00"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  disabled={isPending}
+                />
+              </InputGroup>
             </Field>
 
             <Field>
