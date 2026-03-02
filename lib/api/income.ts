@@ -16,7 +16,7 @@ export async function getIncome(budgetId: string): Promise<IncomeRow[]> {
     .from("income")
     .select("*")
     .eq("budget_id", budgetId)
-    .order("created_at", { ascending: true });
+    .order("amount_pence", { ascending: false });
 
   if (error) throw error;
   return data ?? [];
