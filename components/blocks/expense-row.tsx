@@ -4,31 +4,12 @@ import { useState } from "react";
 import {
   Button,
   Checkbox,
-  Field,
-  FieldGroup,
   H3,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-  Label,
   P,
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
   TableCell,
   TableRow,
 } from "@/components/ui";
-import {
-  CategorySelectOptions,
-  dayOptions,
-  ExpenseCategory,
-} from "@/app/contants";
+import { CategorySelectOptions, ExpenseCategory } from "@/app/contants";
 import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import { useDeleteExpense } from "@/lib/hooks/useDeleteExpense";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
@@ -47,9 +28,9 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Spinner } from "../ui/spinner";
-import { Switch } from "../ui/switch";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
+import ExpenseFormFields from "./expense-form-fields";
 
 type ExpenseTableRowProps = {
   budgetId: string;
@@ -173,117 +154,20 @@ export default function ExpenseTableRow({
             );
           }}
         >
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="expense-name">Name</Label>
-              <Input
-                id="expense-name"
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={isPending}
-                required
-              />
-            </Field>
-
-            <Field>
-              <Label htmlFor="expense-amount">Amount</Label>
-
-              <InputGroup>
-                <InputGroupAddon>
-                  <InputGroupText className="text-base font-normal">
-                    £
-                  </InputGroupText>
-                </InputGroupAddon>
-                <InputGroupInput
-                  id="expense-amount"
-                  name="amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  inputMode="decimal"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  disabled={isPending}
-                />
-              </InputGroup>
-            </Field>
-
-            <Field>
-              <div>
-                <Label className="flex-col items-start">
-                  Payment day
-                  <P isSubtext>
-                    If this day doesn&apos;t exist, we&apos;ll use the last day
-                    of the month.
-                  </P>
-                </Label>
-              </div>
-              <Select
-                items={dayOptions}
-                value={paymentDay}
-                onValueChange={(value) => setPaymentDay(Number(value))}
-                disabled={isPending}
-                required
-              >
-                <SelectTrigger
-                  id="expense-payment-day"
-                  className="w-full max-w-48"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Days of the month</SelectLabel>
-                    {dayOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <Field>
-              <Label htmlFor="expense-category">Category</Label>
-              <Select
-                items={CategorySelectOptions}
-                value={category}
-                onValueChange={(value) => setCategory(value as ExpenseCategory)}
-                disabled={isPending}
-                required
-              >
-                <SelectTrigger
-                  id="expense-category"
-                  className="w-full max-w-48"
-                >
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Categories</SelectLabel>
-                    {CategorySelectOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </Field>
-
-            <Field className="flex-row">
-              <Label htmlFor="expense-is-paid">Mark as paid</Label>
-              <Switch
-                id="expense-is-paid"
-                checked={isPaid}
-                onCheckedChange={() => setIsPaid(!isPaid)}
-                disabled={isPending}
-              />
-            </Field>
-          </FieldGroup>
+          <ExpenseFormFields
+            idPrefix={`expense-${expense.id}`}
+            name={name}
+            amount={amount}
+            paymentDay={paymentDay}
+            category={category}
+            isPaid={isPaid}
+            disabled={isPending}
+            onNameChange={setName}
+            onAmountChange={setAmount}
+            onPaymentDayChange={setPaymentDay}
+            onCategoryChange={setCategory}
+            onIsPaidChange={setIsPaid}
+          />
 
           <DialogFooter className="flex-row">
             <Button
