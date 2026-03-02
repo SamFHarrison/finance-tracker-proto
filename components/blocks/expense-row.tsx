@@ -15,7 +15,7 @@ import { useDeleteExpense } from "@/lib/hooks/useDeleteExpense";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
 import { ExpenseRow } from "@/lib/supabase/types/types";
 import { useMutateExpense } from "@/lib/hooks/useMutateExpense";
-import { useUserId } from "@/lib/hooks/useUserId";
+import { useGetUser } from "@/lib/hooks/useGetUser";
 import { computePaymentDateForCycle } from "@/lib/utils/calculateExpensePaymentDate";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { formatDayOrdinal } from "@/lib/utils/formatDayOrdinal";
@@ -42,8 +42,8 @@ export default function ExpenseTableRow({
   expense,
 }: ExpenseTableRowProps) {
   const { data: budget } = useCurrentBudget();
-  const { data: userId } = useUserId();
-  const { data: profile } = useGetProfile(userId);
+  const { data: user } = useGetUser();
+  const { data: profile } = useGetProfile(user?.id);
 
   const mutateExpense = useMutateExpense(budgetId);
   const deleteExpense = useDeleteExpense(budgetId);

@@ -8,7 +8,6 @@ import {
   Button,
   Card,
   H1,
-  H2,
   H3,
   P,
   Table,
@@ -16,7 +15,7 @@ import {
   TableCell,
   TableRow,
 } from "@/components/ui";
-import { ArrowUpRightIcon, FolderSearch, ThumbsUp } from "lucide-react";
+import { ArrowUpRightIcon, FolderSearch, Frown, ThumbsUp } from "lucide-react";
 import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import {
   Empty,
@@ -33,15 +32,15 @@ import { useGetBudgetSummary } from "@/lib/hooks/useGetBudgetSummary";
 import { useGetExpenses } from "@/lib/hooks/useGetExpenses";
 import { buildBudgetCycleString } from "@/lib/utils/buildBudgetCycleString";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
-import { useUserId } from "@/lib/hooks/useUserId";
+import { useGetUser } from "@/lib/hooks/useGetUser";
 
 export default function Page() {
-  const { data: userId, isLoading: userIdLoading } = useUserId();
-  const { data: profile, isLoading: profileLoading } = useGetProfile(userId);
+  const { data: user, isLoading: userLoading } = useGetUser();
+  const { data: profile, isLoading: profileLoading } = useGetProfile(user?.id);
   const { data: budget, isLoading: budgetLoading } = useCurrentBudget();
   const budgetId = budget?.id;
   const isBudgetCycleLoading =
-    userIdLoading || (Boolean(userId) && profileLoading);
+    userLoading || (Boolean(user?.id) && profileLoading);
   const budgetCycleString = budget
     ? isBudgetCycleLoading
       ? "—"
@@ -57,7 +56,7 @@ export default function Page() {
   if (budgetLoading)
     return (
       <Empty>
-        <Spinner />
+        <Spinner className="size-10" />
       </Empty>
     );
 
@@ -67,7 +66,7 @@ export default function Page() {
       <Empty>
         <EmptyHeader>
           <EmptyMedia variant="icon">
-            <FolderSearch size={100} />
+            <Frown size={100} />
           </EmptyMedia>
           <EmptyTitle>Create a new budget</EmptyTitle>
           <EmptyDescription>

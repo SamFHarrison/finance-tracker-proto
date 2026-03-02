@@ -16,15 +16,15 @@ import { ExpenseCategory } from "@/app/contants";
 import { computePaymentDateForCycle } from "@/lib/utils/calculateExpensePaymentDate";
 import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
-import { useUserId } from "@/lib/hooks/useUserId";
+import { useGetUser } from "@/lib/hooks/useGetUser";
 import { Spinner } from "../ui/spinner";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import ExpenseFormFields from "./expense-form-fields";
 
 export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
   const { data: budget } = useCurrentBudget();
-  const { data: userId } = useUserId();
-  const { data: profile } = useGetProfile(userId);
+  const { data: user } = useGetUser();
+  const { data: profile } = useGetProfile(user?.id);
   const createExpense = useCreateExpense(budgetId);
 
   const [open, setOpen] = useState(false);
