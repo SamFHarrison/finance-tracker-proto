@@ -7,7 +7,7 @@ interface Typography extends PropsWithChildren {
 
 export function H1({ children, className }: Typography) {
   const classes = cn(
-    "scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance",
+    "scroll-m-20 text-4xl font-extrabold tracking-tight text-balance",
     className,
   );
   return <h1 className={classes}>{children}</h1>;

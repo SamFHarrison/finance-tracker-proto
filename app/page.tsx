@@ -8,6 +8,7 @@ import {
   Button,
   Card,
   H1,
+  H2,
   H3,
   P,
   Table,
@@ -30,10 +31,24 @@ import { useGetIncome } from "@/lib/hooks/useGetIncome";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { useGetBudgetSummary } from "@/lib/hooks/useGetBudgetSummary";
 import { useGetExpenses } from "@/lib/hooks/useGetExpenses";
+import { buildBudgetCycleString } from "@/lib/utils/buildBudgetCycleString";
+import { useGetProfile } from "@/lib/hooks/useGetProfile";
+import { useUserId } from "@/lib/hooks/useUserId";
 
 export default function Page() {
+  const { data: userId, isLoading: userIdLoading } = useUserId();
+  const { data: profile, isLoading: profileLoading } = useGetProfile(userId);
   const { data: budget, isLoading: budgetLoading } = useCurrentBudget();
   const budgetId = budget?.id;
+  const isBudgetCycleLoading =
+    userIdLoading || (Boolean(userId) && profileLoading);
+  const budgetCycleString = budget
+    ? isBudgetCycleLoading
+      ? "—"
+      : buildBudgetCycleString(budget.period_start, {
+          nextMonthStartDay: profile?.next_month_start_day,
+        })
+    : "—";
 
   const { data: budgetSummary } = useGetBudgetSummary(budgetId);
   const { data: income } = useGetIncome(budgetId);
@@ -77,8 +92,8 @@ export default function Page() {
     <>
       <div className="flex px-4 justify-between items-end">
         <div>
-          <P isSubtext>2026</P>
-          <H1>February</H1>
+          <P isSubtext>Your current financial month is</P>
+          <H1 className="font-semibold border-0 pt-1">{budgetCycleString}</H1>
         </div>
 
         {/* <Link href="/settings">
@@ -89,49 +104,54 @@ export default function Page() {
       </div>
 
       <div className="px-4">
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell>
-                <P>Income</P>
-              </TableCell>
-              <TableCell className="text-right">
-                <P>
-                  {budgetSummary &&
-                    formatCurrencyFromMinorUnits(
-                      budgetSummary.income_total_pence,
-                    )}
-                </P>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <P>Ougoings</P>
-              </TableCell>
-              <TableCell className="text-right">
-                <P>
-                  {budgetSummary &&
-                    formatCurrencyFromMinorUnits(
-                      budgetSummary.expense_total_pence,
-                    )}
-                </P>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <H3>Still to pay</H3>
-              </TableCell>
-              <TableCell className="text-right">
-                <H3>
-                  {budgetSummary &&
-                    formatCurrencyFromMinorUnits(
-                      budgetSummary.still_to_pay_pence,
-                    )}
-                </H3>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+        <div className="flex justify-between pl-2 pb-2 items-center">
+          <H3>Summary</H3>
+        </div>
+        <Card className="py-0 px-2">
+          <Table>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <P>Income</P>
+                </TableCell>
+                <TableCell className="text-right">
+                  <P>
+                    {budgetSummary &&
+                      formatCurrencyFromMinorUnits(
+                        budgetSummary.income_total_pence,
+                      )}
+                  </P>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <P>Ougoings</P>
+                </TableCell>
+                <TableCell className="text-right">
+                  <P>
+                    {budgetSummary &&
+                      formatCurrencyFromMinorUnits(
+                        budgetSummary.expense_total_pence,
+                      )}
+                  </P>
+                </TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>
+                  <P>Still to pay</P>
+                </TableCell>
+                <TableCell className="text-right">
+                  <H3>
+                    {budgetSummary &&
+                      formatCurrencyFromMinorUnits(
+                        budgetSummary.still_to_pay_pence,
+                      )}
+                  </H3>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Card>
       </div>
 
       <div className="px-4">
