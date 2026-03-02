@@ -1,20 +1,6 @@
 "use client";
 
-import {
-  Button,
-  Field,
-  FieldGroup,
-  H3,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-  InputGroupText,
-  Label,
-  P,
-  TableCell,
-  TableRow,
-} from "@/components/ui";
+import { Button, H3, P, TableCell, TableRow } from "@/components/ui";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { IncomeRow } from "@/lib/supabase/types/types";
 import {
@@ -27,11 +13,11 @@ import {
 } from "../ui/dialog";
 import { useState } from "react";
 import { Spinner } from "../ui/spinner";
-import { Switch } from "../ui/switch";
 import { useMutateIncome } from "@/lib/hooks/useMutateIncome";
 import { useDeleteIncome } from "@/lib/hooks/useDeleteIncome";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
+import IncomeFormFields from "./income-form-fields";
 
 type IncomeTableRowProps = {
   income: IncomeRow;
@@ -119,55 +105,16 @@ export default function IncomeTableRow({
             );
           }}
         >
-          <FieldGroup>
-            <Field>
-              <Label htmlFor="income-name">Name</Label>
-              <Input
-                id="income-name"
-                name="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                disabled={isPending}
-                required
-              />
-            </Field>
-
-            <Field>
-              <Label htmlFor="income-amount">Amount</Label>
-
-              <InputGroup>
-                <InputGroupAddon>
-                  <InputGroupText className="text-base font-normal">
-                    £
-                  </InputGroupText>
-                </InputGroupAddon>
-                <InputGroupInput
-                  id="income-amount"
-                  name="amount"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  inputMode="decimal"
-                  placeholder="0.00"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  disabled={isPending}
-                />
-              </InputGroup>
-            </Field>
-
-            <Field className="flex-row">
-              <Label htmlFor="income-is-monthly">
-                Add this income every month
-              </Label>
-              <Switch
-                id="income-is-monthly"
-                checked={isMonthly}
-                onCheckedChange={() => setIsMonthly(!isMonthly)}
-                disabled={isPending}
-              />
-            </Field>
-          </FieldGroup>
+          <IncomeFormFields
+            idPrefix={`income-${income.id}`}
+            name={name}
+            amount={amount}
+            isMonthly={isMonthly}
+            disabled={isPending}
+            onNameChange={setName}
+            onAmountChange={setAmount}
+            onIsMonthlyChange={setIsMonthly}
+          />
 
           <DialogFooter className="flex-row">
             <Button
