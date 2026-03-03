@@ -4,14 +4,14 @@
  * This is the recommended representation for money in apps because it avoids floating-point
  * precision issues (store integers, format for display).
  *
- * @param minorUnits - Amount in minor units (for GBP: pence). Example: `3000` = £30.00
+ * @param minorUnits - Amount in minor units (for GBP: pence). Example: `3000` = £30
  * @param options
  * @param options.currency - ISO 4217 currency code. Defaults to `"GBP"`.
  * @param options.locale - BCP 47 locale tag used for formatting. Defaults to `"en-GB"`.
- * @returns A formatted currency string (e.g. `"£30.00"`). Returns `"—"` if input is not finite.
+ * @returns A formatted currency string (e.g. `"£30"` or `"£30.50"`). Returns `"—"` if input is not finite.
  *
  * @example
- * formatCurrencyFromMinorUnits(3000) // "£30.00"
+ * formatCurrencyFromMinorUnits(3000) // "£30"
  * formatCurrencyFromMinorUnits(123456) // "£1,234.56"
  * formatCurrencyFromMinorUnits(-99) // "-£0.99"
  *
@@ -32,11 +32,12 @@ export function formatCurrencyFromMinorUnits(
 
   // For 2-decimal currencies: minorUnits (pence) -> majorUnits (pounds)
   const majorUnits = minorUnits / 100;
+  const hasWholeMajorUnits = minorUnits % 100 === 0;
 
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    minimumFractionDigits: 2,
+    minimumFractionDigits: hasWholeMajorUnits ? 0 : 2,
     maximumFractionDigits: 2,
   }).format(majorUnits);
 }

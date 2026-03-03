@@ -106,7 +106,9 @@ export default function ExpenseTableRow({
                 {categoryLabel}
               </P>
             </div>
-            <H3>{formatCurrencyFromMinorUnits(expense.amount_pence)}</H3>
+            <H3 className="tabular-nums">
+              {formatCurrencyFromMinorUnits(expense.amount_pence)}
+            </H3>
           </DialogTrigger>
         </TableCell>
       </TableRow>
