@@ -21,7 +21,7 @@ import { useGetExpenses } from "@/lib/hooks/useGetExpenses";
 import { buildBudgetCycleString } from "@/lib/utils/buildBudgetCycleString";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
 import { useGetUser } from "@/lib/hooks/useGetUser";
-import { BudgetSummary } from "@/components/blocks/income-expense-radial-chart";
+import { BudgetSummary } from "@/components/blocks/BudgetSummary";
 
 export default function Page() {
   const { data: user, isLoading: userLoading } = useGetUser();
