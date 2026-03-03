@@ -3,7 +3,6 @@
 import { Button, H3, P } from "@/components/ui";
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,

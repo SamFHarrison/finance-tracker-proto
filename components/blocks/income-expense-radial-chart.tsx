@@ -130,15 +130,6 @@ export function BudgetSummary() {
           </RadialBarChart>
         </ChartContainer>
       </CardContent>
-
-      {/* <Separator />
-
-      <CardContent className="flex justify-between">
-        <H3>Still to pay</H3>
-        <H3>
-          {formatCurrencyFromMinorUnits(budgetSummary?.still_to_pay_pence ?? 0)}
-        </H3>
-      </CardContent> */}
     </Card>
   );
 }

@@ -4,18 +4,8 @@ import AddExpenseForm from "@/components/blocks/add-expense";
 import AddIncomeForm from "@/components/blocks/add-income";
 import ExpenseTableRow from "@/components/blocks/expense-row";
 import IncomeTableRow from "@/components/blocks/income-row";
-import {
-  Button,
-  Card,
-  H1,
-  H3,
-  P,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-} from "@/components/ui";
-import { ArrowUpRightIcon, FolderSearch, Frown, ThumbsUp } from "lucide-react";
+import { Button, Card, H1, H3, P, Table, TableBody } from "@/components/ui";
+import { ArrowUpRightIcon, Frown, ThumbsUp } from "lucide-react";
 import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import {
   Empty,
@@ -27,13 +17,10 @@ import {
 } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
 import { useGetIncome } from "@/lib/hooks/useGetIncome";
-import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
-import { useGetBudgetSummary } from "@/lib/hooks/useGetBudgetSummary";
 import { useGetExpenses } from "@/lib/hooks/useGetExpenses";
 import { buildBudgetCycleString } from "@/lib/utils/buildBudgetCycleString";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
 import { useGetUser } from "@/lib/hooks/useGetUser";
-import { ChartBarHorizontal } from "@/components/blocks/income-expense-chart";
 import { BudgetSummary } from "@/components/blocks/income-expense-radial-chart";
 
 export default function Page() {
@@ -51,7 +38,6 @@ export default function Page() {
         })
     : "—";
 
-  const { data: budgetSummary } = useGetBudgetSummary(budgetId);
   const { data: income } = useGetIncome(budgetId);
   const { data: expenses } = useGetExpenses(budgetId);
 
@@ -140,7 +126,7 @@ export default function Page() {
 
       <div className="px-4">
         <div className="flex justify-between pl-2 pb-2 items-center h-12">
-          <H3>Outgoings</H3>
+          <H3>Expenses</H3>
 
           {budgetId && <AddExpenseForm budgetId={budgetId} />}
         </div>
