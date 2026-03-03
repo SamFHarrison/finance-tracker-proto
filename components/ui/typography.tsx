@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils/cn";
+import clsx from "clsx";
 import { PropsWithChildren } from "react";
 
 interface Typography extends PropsWithChildren {
@@ -34,10 +35,10 @@ interface PProps extends Typography {
 }
 
 export function P({ className, children, isSubtext }: PProps) {
-  const classes = cn({
+  const classes = clsx({
     "leading-7 [&:not(:first-child)]:mt-6": !isSubtext,
     "text-muted-foreground text-sm": isSubtext,
-    className,
+    className: className !== undefined,
   });
   return <p className={classes}>{children}</p>;
 }

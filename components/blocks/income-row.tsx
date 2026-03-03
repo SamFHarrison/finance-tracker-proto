@@ -71,7 +71,9 @@ export default function IncomeTableRow({
               <P>{income.name}</P>
               <P isSubtext>{income.is_monthly ? "Monthly" : "Additional"}</P>
             </div>
-            <H3>{formatCurrencyFromMinorUnits(income.amount_pence)}</H3>
+            <H3 className="tabular-nums">
+              {formatCurrencyFromMinorUnits(income.amount_pence)}
+            </H3>
           </DialogTrigger>
         </TableCell>
       </TableRow>

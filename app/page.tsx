@@ -33,6 +33,8 @@ import { useGetExpenses } from "@/lib/hooks/useGetExpenses";
 import { buildBudgetCycleString } from "@/lib/utils/buildBudgetCycleString";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
 import { useGetUser } from "@/lib/hooks/useGetUser";
+import { ChartBarHorizontal } from "@/components/blocks/income-expense-chart";
+import { BudgetSummary } from "@/components/blocks/income-expense-radial-chart";
 
 export default function Page() {
   const { data: user, isLoading: userLoading } = useGetUser();
@@ -103,58 +105,15 @@ export default function Page() {
       </div>
 
       <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-center">
+        <div className="flex justify-between pl-2 pb-2 items-center h-12">
           <H3>Summary</H3>
         </div>
-        <Card className="py-0 px-2">
-          <Table>
-            <TableBody>
-              <TableRow>
-                <TableCell>
-                  <P>Income</P>
-                </TableCell>
-                <TableCell className="text-right">
-                  <P>
-                    {budgetSummary &&
-                      formatCurrencyFromMinorUnits(
-                        budgetSummary.income_total_pence,
-                      )}
-                  </P>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <P>Ougoings</P>
-                </TableCell>
-                <TableCell className="text-right">
-                  <P>
-                    {budgetSummary &&
-                      formatCurrencyFromMinorUnits(
-                        budgetSummary.expense_total_pence,
-                      )}
-                  </P>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>
-                  <P>Still to pay</P>
-                </TableCell>
-                <TableCell className="text-right">
-                  <H3>
-                    {budgetSummary &&
-                      formatCurrencyFromMinorUnits(
-                        budgetSummary.still_to_pay_pence,
-                      )}
-                  </H3>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </Card>
+
+        <BudgetSummary />
       </div>
 
       <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-center">
+        <div className="flex justify-between pl-2 pb-2 items-center h-12">
           <H3>Income</H3>
 
           {budgetId && <AddIncomeForm budgetId={budgetId} />}
@@ -180,7 +139,7 @@ export default function Page() {
       </div>
 
       <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-center">
+        <div className="flex justify-between pl-2 pb-2 items-center h-12">
           <H3>Outgoings</H3>
 
           {budgetId && <AddExpenseForm budgetId={budgetId} />}
