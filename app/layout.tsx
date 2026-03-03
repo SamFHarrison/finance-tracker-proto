@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
+    startupImage: "/icons/icon-512.png",
     title: "FinTrack Prototype",
   },
   formatDetection: {

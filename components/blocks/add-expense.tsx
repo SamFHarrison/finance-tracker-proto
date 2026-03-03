@@ -12,7 +12,7 @@ import { Plus } from "lucide-react";
 import { Button } from "../ui";
 import { useCreateExpense } from "@/lib/hooks/useCreateExpense";
 import { useState } from "react";
-import { ExpenseCategory } from "@/app/contants";
+import { ExpenseCategory } from "@/lib/contants";
 import { computePaymentDateForCycle } from "@/lib/utils/calculateExpensePaymentDate";
 import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";

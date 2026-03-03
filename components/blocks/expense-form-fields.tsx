@@ -22,7 +22,7 @@ import {
   CategorySelectOptions,
   dayOptions,
   ExpenseCategory,
-} from "@/app/contants";
+} from "@/lib/contants";
 import { Switch } from "../ui/switch";
 
 type ExpenseFormFieldsProps = {

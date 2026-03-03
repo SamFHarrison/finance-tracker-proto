@@ -1,15 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Button,
-  Checkbox,
-  H3,
-  P,
-  TableCell,
-  TableRow,
-} from "@/components/ui";
-import { CategorySelectOptions, ExpenseCategory } from "@/app/contants";
+import { Button, Checkbox, H3, P, TableCell, TableRow } from "@/components/ui";
+import { CategorySelectOptions, ExpenseCategory } from "@/lib/contants";
 import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import { useDeleteExpense } from "@/lib/hooks/useDeleteExpense";
 import { useGetProfile } from "@/lib/hooks/useGetProfile";
