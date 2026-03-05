@@ -41,13 +41,6 @@ export default function Page() {
   const { data: income } = useGetIncome(budgetId);
   const { data: expenses } = useGetExpenses(budgetId);
 
-  if (budgetLoading)
-    return (
-      <Empty>
-        <Spinner className="size-10" />
-      </Empty>
-    );
-
   if (!budgetLoading && !budgetId) {
     return (
       // TODO: Turn into empty error page component
