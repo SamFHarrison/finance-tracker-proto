@@ -2,13 +2,7 @@
 
 import { cn } from "@/lib/utils/cn";
 import { H3 } from "@/components/ui";
-import {
-  ChartPie,
-  ClipboardList,
-  Sprout,
-  UserRound,
-  type LucideIcon,
-} from "lucide-react";
+import { ClipboardList, UserRound, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -29,16 +23,16 @@ const defaultTabs: TabBarItem[] = [
     label: "Budget",
     icon: ClipboardList,
   },
-  {
-    href: "/analysis",
-    label: "Analysis",
-    icon: ChartPie,
-  },
-  {
-    href: "/growth",
-    label: "Growth",
-    icon: Sprout,
-  },
+  // {
+  //   href: "/analysis",
+  //   label: "Analysis",
+  //   icon: ChartPie,
+  // },
+  // {
+  //   href: "/growth",
+  //   label: "Growth",
+  //   icon: Sprout,
+  // },
   {
     href: "/settings",
     label: "Profile",
