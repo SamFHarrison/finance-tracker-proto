@@ -14,17 +14,23 @@ import { useCreateExpense } from "@/lib/hooks/useCreateExpense";
 import { useState } from "react";
 import { ExpenseCategory } from "@/lib/contants";
 import { computePaymentDateForCycle } from "@/lib/utils/calculateExpensePaymentDate";
-import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
-import { useGetProfile } from "@/lib/hooks/useGetProfile";
-import { useGetUser } from "@/lib/hooks/useGetUser";
 import { Spinner } from "../ui/spinner";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import ExpenseFormFields from "./expense-form-fields";
+import { useRouter } from "next/navigation";
 
-export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
-  const { data: budget } = useCurrentBudget();
-  const { data: user } = useGetUser();
-  const { data: profile } = useGetProfile(user?.id);
+type AddExpenseFormProps = {
+  budgetId: string;
+  periodStart: string;
+  monthStartDay: number;
+};
+
+export default function AddExpenseForm({
+  budgetId,
+  periodStart,
+  monthStartDay,
+}: AddExpenseFormProps) {
+  const router = useRouter();
   const createExpense = useCreateExpense(budgetId);
 
   const [open, setOpen] = useState(false);
@@ -58,7 +64,6 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
           onSubmit={(e) => {
             e.preventDefault();
 
-            if (!budget || !profile) return;
             const amountPence = parseCurrencyToMinorUnits(amount);
             if (amountPence === null) return;
 
@@ -69,8 +74,8 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
                 amount_pence: amountPence,
                 category: category,
                 payment_date: computePaymentDateForCycle({
-                  periodStart: budget.period_start,
-                  monthStartDay: profile.month_start_day,
+                  periodStart,
+                  monthStartDay,
                   paymentDay: paymentDay,
                 }),
                 is_paid: false,
@@ -79,6 +84,7 @@ export default function AddExpenseForm({ budgetId }: { budgetId: string }) {
                 onSuccess: () => {
                   resetForm();
                   setOpen(false);
+                  router.refresh();
                 },
               },
             );

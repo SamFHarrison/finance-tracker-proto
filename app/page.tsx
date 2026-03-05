@@ -1,12 +1,6 @@
-"use client";
-
-import AddExpenseForm from "@/components/blocks/add-expense";
-import AddIncomeForm from "@/components/blocks/add-income";
-import ExpenseTableRow from "@/components/blocks/expense-row";
-import IncomeTableRow from "@/components/blocks/income-row";
-import { Button, Card, H1, H3, P, Table, TableBody } from "@/components/ui";
-import { ArrowUpRightIcon, Frown, ThumbsUp } from "lucide-react";
-import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
+import HomeDashboard from "@/components/blocks/home-dashboard";
+import { Button, H1, P } from "@/components/ui";
+import { ArrowUpRightIcon, Frown } from "lucide-react";
 import {
   Empty,
   EmptyContent,
@@ -15,33 +9,42 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { Spinner } from "@/components/ui/spinner";
-import { useGetIncome } from "@/lib/hooks/useGetIncome";
-import { useGetExpenses } from "@/lib/hooks/useGetExpenses";
 import { buildBudgetCycleString } from "@/lib/utils/buildBudgetCycleString";
-import { useGetProfile } from "@/lib/hooks/useGetProfile";
-import { useGetUser } from "@/lib/hooks/useGetUser";
-import { BudgetSummary } from "@/components/blocks/BudgetSummary";
+import { getUser } from "@/lib/api/user.server";
+import { getProfile } from "@/lib/api/profile.server";
+import { getCurrentBudget } from "@/lib/api/currentBudget.server";
+import { getIncome } from "@/lib/api/income.server";
+import { getExpenses } from "@/lib/api/expenses.server";
+import { getBudgetSummary } from "@/lib/api/budgetSummary.server";
 
-export default function Page() {
-  const { data: user, isLoading: userLoading } = useGetUser();
-  const { data: profile, isLoading: profileLoading } = useGetProfile(user?.id);
-  const { data: budget, isLoading: budgetLoading } = useCurrentBudget();
-  const budgetId = budget?.id;
-  const isBudgetCycleLoading =
-    userLoading || (Boolean(user?.id) && profileLoading);
+export default async function Page() {
+  const { id: userId } = await getUser();
+  const [profile, budget] = await Promise.all([
+    getProfile(userId),
+    getCurrentBudget(),
+  ]);
+
+  if (!profile) {
+    return (
+      <Empty className="mb-50 px-8">
+        <EmptyHeader>
+          <EmptyTitle>Something went wrong</EmptyTitle>
+          <EmptyDescription>
+            We might be doing necessary maintenence. Please try again later.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
+    );
+  }
+
+  const budgetId = budget?.id ?? null;
   const budgetCycleString = budget
-    ? isBudgetCycleLoading
-      ? "—"
-      : buildBudgetCycleString(budget.period_start, {
-          nextMonthStartDay: profile?.next_month_start_day,
-        })
+    ? buildBudgetCycleString(budget.period_start, {
+        nextMonthStartDay: profile.next_month_start_day,
+      })
     : "—";
 
-  const { data: income } = useGetIncome(budgetId);
-  const { data: expenses } = useGetExpenses(budgetId);
-
-  if (!budgetLoading && !budgetId) {
+  if (!budgetId || !budget) {
     return (
       // TODO: Turn into empty error page component
       <Empty>
@@ -68,6 +71,12 @@ export default function Page() {
     );
   }
 
+  const [income, expenses, budgetSummary] = await Promise.all([
+    getIncome(budgetId),
+    getExpenses(budgetId),
+    getBudgetSummary(budgetId),
+  ]);
+
   return (
     <>
       <div className="flex px-4 justify-between items-end">
@@ -75,77 +84,16 @@ export default function Page() {
           <P isSubtext>Your current financial month is</P>
           <H1 className="font-semibold border-0 pt-1">{budgetCycleString}</H1>
         </div>
-
-        {/* <Link href="/settings">
-          <Button variant="outline" size="icon-lg">
-            <SettingsIcon />
-          </Button>
-        </Link> */}
       </div>
 
-      <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-center h-12">
-          <H3>Summary</H3>
-        </div>
-
-        <BudgetSummary />
-      </div>
-
-      <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-center h-12">
-          <H3>Income</H3>
-
-          {budgetId && <AddIncomeForm budgetId={budgetId} />}
-        </div>
-
-        <Card className="py-0 px-2">
-          <Table>
-            <TableBody>
-              {income &&
-                budgetId &&
-                income.map((income) => {
-                  return (
-                    <IncomeTableRow
-                      key={income.id}
-                      income={income}
-                      budgetId={budgetId}
-                    />
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </Card>
-      </div>
-
-      <div className="px-4">
-        <div className="flex justify-between pl-2 pb-2 items-center h-12">
-          <H3>Expenses</H3>
-
-          {budgetId && <AddExpenseForm budgetId={budgetId} />}
-        </div>
-        <Card className="py-0 px-2">
-          <Table>
-            <TableBody>
-              {expenses &&
-                budgetId &&
-                expenses.map((expense) => {
-                  return (
-                    <ExpenseTableRow
-                      key={expense.id}
-                      budgetId={budgetId}
-                      expense={expense}
-                    />
-                  );
-                })}
-            </TableBody>
-          </Table>
-        </Card>
-      </div>
-
-      <div className="flex flex-col w-full items-center text-muted-foreground gap-1 px-4 pb-40 pt-10">
-        <ThumbsUp />
-        <P isSubtext>That&apos;s all</P>
-      </div>
+      <HomeDashboard
+        budgetId={budgetId}
+        periodStart={budget.period_start}
+        monthStartDay={profile.month_start_day}
+        income={income}
+        expenses={expenses}
+        budgetSummary={budgetSummary}
+      />
     </>
   );
 }
