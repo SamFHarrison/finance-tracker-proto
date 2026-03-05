@@ -1,6 +1,6 @@
 export type WithUndefined<T> = { [K in keyof T]?: T[K] | undefined };
 
-export function compactUndefined<T extends Record<string, any>>(
+export function compactUndefined<T extends Record<string, unknown>>(
   obj: T,
 ): Partial<T> {
   return Object.fromEntries(
