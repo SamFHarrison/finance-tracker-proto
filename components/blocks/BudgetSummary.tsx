@@ -17,7 +17,7 @@ import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUni
 const chartConfig = {
   expenses: {
     label: "Expenses",
-    color: "var(--chart-1)",
+    color: "var(--chart-4)",
   },
   track: {
     label: "Track",

@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientSideProviders from "@/components/providers/ClientSideProviders";
+import TabBar from "@/components/blocks/TabBar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -42,7 +43,10 @@ export default async function RootLayout({
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="flex h-dvh flex-col gap-8 overflow-y-scroll pt-4">
         <ThemeProvider>
-          <ClientSideProviders>{children}</ClientSideProviders>
+          <ClientSideProviders>
+            {children}
+            <TabBar />
+          </ClientSideProviders>
         </ThemeProvider>
       </body>
     </html>
