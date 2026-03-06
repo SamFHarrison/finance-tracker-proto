@@ -83,7 +83,7 @@ export default function TabBar({ tabs = defaultTabs, className }: TabBarProps) {
                 </H3>
                 <span
                   className={cn(
-                    "absolute bottom-0 h-1 w-8 rounded-full bg-primary transition-opacity",
+                    "absolute bottom-0 h-1 w-8 rounded-full bg-primary transition-opacity duration-100",
                     isActive ? "opacity-100" : "opacity-0",
                   )}
                   aria-hidden
