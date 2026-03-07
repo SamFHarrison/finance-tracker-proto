@@ -1,12 +1,11 @@
 # TODO
 
-## Major
+## Ready for
 
 - Implement react-hook-form in all forms
-
-## Minor
-
 - Polish padding across `<Card />` and `<Field />` components and sub-components
+- Make some form fields `orientation="horizontal"` where possible
+- Make buttons bigger so they're easier to hit
 
 ## Needs more thought
 
