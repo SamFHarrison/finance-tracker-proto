@@ -103,8 +103,8 @@ export default function ExpenseFormFields({
           <Label className="flex-col items-start">
             Payment day
             <P isSubtext>
-              If this day doesn&apos;t exist, we&apos;ll use the last day of the
-              month.
+              If the month is shorter than this day, it&apos;ll default to last
+              day of the month.
             </P>
           </Label>
         </div>

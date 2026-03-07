@@ -14,6 +14,7 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
+  FieldLabelWrapper,
   FieldSet,
   Input,
   Select,
@@ -158,10 +159,12 @@ export default function SettingsForm({
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="display-name">Display name</FieldLabel>
-                  <FieldDescription>
-                    Set your display name for a more personal experience.
-                  </FieldDescription>
+                  <FieldLabelWrapper>
+                    <FieldLabel htmlFor="display-name">Display name</FieldLabel>
+                    <FieldDescription>
+                      Set your display name for a more personal experience.
+                    </FieldDescription>
+                  </FieldLabelWrapper>
                   <Input
                     id="display-name"
                     type="text"
@@ -184,13 +187,15 @@ export default function SettingsForm({
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="budget-cycle-day">
-                    Budget cycle date
-                  </FieldLabel>
-                  <FieldDescription>
-                    Choose what day you want your cycle to start on. It will
-                    take effect on your next cycle.
-                  </FieldDescription>
+                  <FieldLabelWrapper>
+                    <FieldLabel htmlFor="budget-cycle-day">
+                      Budget cycle date
+                    </FieldLabel>
+                    <FieldDescription>
+                      Choose what day you want your cycle to start on. It will
+                      take effect on your next cycle.
+                    </FieldDescription>
+                  </FieldLabelWrapper>
 
                   <Select
                     items={dayOptions}

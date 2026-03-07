@@ -37,7 +37,7 @@ export function LoginForm({
       });
       if (error) throw error;
       // Force a full navigation so server-side auth checks see fresh session cookies.
-      window.location.assign("/");
+      window.location.assign("/budget");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
