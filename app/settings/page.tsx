@@ -40,6 +40,7 @@ export default async function SettingsPage() {
 
         <SettingsForm
           userId={user.id}
+          displayName={profile.display_name}
           monthStartDay={profile.month_start_day}
           nextMonthStartDay={profile.next_month_start_day}
         />
