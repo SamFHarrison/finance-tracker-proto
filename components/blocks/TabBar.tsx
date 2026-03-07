@@ -74,7 +74,7 @@ export default function TabBar({ tabs = defaultTabs, className }: TabBarProps) {
             <li key={tab.href} className="flex">
               <Link
                 href={tab.href}
-                className="relative flex w-full flex-col items-center gap-2 px-2 pb-3 pt-4"
+                className="relative flex w-full flex-col items-center gap-2 px-2 pb-3 pt-2"
                 aria-current={isActive ? "page" : undefined}
               >
                 <Icon className="size-6" aria-hidden />
