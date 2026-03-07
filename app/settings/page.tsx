@@ -28,7 +28,7 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <div className="flex flex-col px-4 justify-between items-center py-10">
+      <div className="flex flex-col px-4 justify-between items-center">
         <P isSubtext>Your account</P>
         <H3 className="text-lg">{user.email ?? "No email"}</H3>
       </div>
