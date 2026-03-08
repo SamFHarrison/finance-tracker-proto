@@ -20,3 +20,4 @@
 - `/growth` page
 - Header section of `/budget`
 - Page error component
+- Add logout and delete account/data features
