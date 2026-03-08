@@ -8,31 +8,27 @@ A prototype monthly budget tracker built with Next.js and Supabase.
 - React
 - TypeScript
 - Tailwind
+- shadcn/ui (base-ui)
 - TanStack Query
-- Supabase Auth, Postgres, and Row Level Security
-- shadcn/ui
-- base-ui
+- react-hook-form
+- Supabase with auth
 
 ## Project Structure
 
 ```text
 app/
-  auth/                  Auth pages + functions
-  settings/              User settings page
-  page.tsx               Main user dashboard
-  layout.tsx             Root layout
-
+  auth/                  Auth pages (login, sign up, etc)
+  (app)/                 Authenticated features
+  page.tsx               Redirect to (app)/budget (planned to be public landing page)
 components/
   blocks/                Feature-level UI
-  ui/                    UI primitives
-
+  ui/                    Atomic UI primitives
 lib/
   api/                   Supabase queries, mutations and RPC wrappers
   hooks/                 React Query hooks
   supabase/              Client, server, and proxy helpers + database types
   types/                 App types
   utils/                 Common utils
-
 supabase/
   migrations/            Database schema and SQL functions for local development
 ```
