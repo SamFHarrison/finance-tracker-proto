@@ -18,6 +18,7 @@ import { useDeleteIncome } from "@/lib/hooks/useDeleteIncome";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
 import IncomeFormFields from "./income-form-fields";
+import { useRouter } from "next/navigation";
 
 type IncomeTableRowProps = {
   income: IncomeRow;
@@ -28,6 +29,7 @@ export default function IncomeTableRow({
   income,
   budgetId,
 }: IncomeTableRowProps) {
+  const router = useRouter();
   const mutateIncome = useMutateIncome(budgetId);
   const deleteIncome = useDeleteIncome(budgetId);
 
@@ -102,6 +104,7 @@ export default function IncomeTableRow({
               {
                 onSuccess: () => {
                   setOpen(false);
+                  router.refresh();
                 },
               },
             );
@@ -128,6 +131,7 @@ export default function IncomeTableRow({
                 deleteIncome.mutate(income.id, {
                   onSuccess: () => {
                     setOpen(false);
+                    router.refresh();
                   },
                 })
               }

@@ -97,6 +97,19 @@ function FieldContent({ className, ...props }: React.ComponentProps<"div">) {
   );
 }
 
+function FieldLabelWrapper({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="field-content"
+      className={cn("flex flex-col gap-0.5 pl-0.5", className)}
+      {...props}
+    />
+  );
+}
+
 function FieldLabel({
   className,
   ...props
@@ -226,6 +239,7 @@ function FieldError({
 export {
   Field,
   FieldLabel,
+  FieldLabelWrapper,
   FieldDescription,
   FieldError,
   FieldGroup,

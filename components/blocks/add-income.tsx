@@ -15,8 +15,10 @@ import { useState } from "react";
 import { Spinner } from "../ui/spinner";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import IncomeFormFields from "./income-form-fields";
+import { useRouter } from "next/navigation";
 
 export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
+  const router = useRouter();
   const createIncome = useCreateIncome(budgetId);
 
   const [open, setOpen] = useState(false);
@@ -62,6 +64,7 @@ export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
                 onSuccess: () => {
                   resetForm();
                   setOpen(false);
+                  router.refresh();
                 },
               },
             );

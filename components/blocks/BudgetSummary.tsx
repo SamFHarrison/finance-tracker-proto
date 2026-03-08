@@ -9,15 +9,14 @@ import {
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
-import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
-import { useGetBudgetSummary } from "@/lib/hooks/useGetBudgetSummary";
 import { H3, P } from "../ui";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
+import { BudgetSummary as BudgetSummaryData } from "@/lib/types/appTypes";
 
 const chartConfig = {
   expenses: {
     label: "Expenses",
-    color: "var(--chart-1)",
+    color: "var(--chart-4)",
   },
   track: {
     label: "Track",
@@ -25,11 +24,11 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function BudgetSummary() {
-  const { data: budget } = useCurrentBudget();
-  const budgetId = budget?.id;
-  const { data: budgetSummary } = useGetBudgetSummary(budgetId);
+type BudgetSummaryProps = {
+  budgetSummary: BudgetSummaryData | null;
+};
 
+export function BudgetSummary({ budgetSummary }: BudgetSummaryProps) {
   const incomeTotalPence = Number(budgetSummary?.income_total_pence ?? 0);
   const expenseTotalPence = Number(budgetSummary?.expense_total_pence ?? 0);
   const hasIncome = incomeTotalPence > 0;
@@ -72,6 +71,7 @@ export function BudgetSummary() {
         </div>
 
         <ChartContainer
+          id="budget-summary"
           config={chartConfig}
           className="aspect-square w-full max-w-42 pt-2"
         >

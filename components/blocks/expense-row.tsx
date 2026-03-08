@@ -3,12 +3,9 @@
 import { useState } from "react";
 import { Button, Checkbox, H3, P, TableCell, TableRow } from "@/components/ui";
 import { CategorySelectOptions, ExpenseCategory } from "@/lib/contants";
-import { useCurrentBudget } from "@/lib/hooks/useCurrentBudget";
 import { useDeleteExpense } from "@/lib/hooks/useDeleteExpense";
-import { useGetProfile } from "@/lib/hooks/useGetProfile";
 import { ExpenseRow } from "@/lib/supabase/types/types";
 import { useMutateExpense } from "@/lib/hooks/useMutateExpense";
-import { useGetUser } from "@/lib/hooks/useGetUser";
 import { computePaymentDateForCycle } from "@/lib/utils/calculateExpensePaymentDate";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { formatDayOrdinal } from "@/lib/utils/formatDayOrdinal";
@@ -24,24 +21,30 @@ import { Spinner } from "../ui/spinner";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
 import ExpenseFormFields from "./expense-form-fields";
+import { useRouter } from "next/navigation";
 
 type ExpenseTableRowProps = {
   budgetId: string;
   expense: ExpenseRow;
+  periodStart: string;
+  monthStartDay: number;
+  onStillToPayDelta?: (deltaPence: number) => void;
 };
 
 export default function ExpenseTableRow({
   budgetId,
   expense,
+  periodStart,
+  monthStartDay,
+  onStillToPayDelta,
 }: ExpenseTableRowProps) {
-  const { data: budget } = useCurrentBudget();
-  const { data: user } = useGetUser();
-  const { data: profile } = useGetProfile(user?.id);
+  const router = useRouter();
 
   const mutateExpense = useMutateExpense(budgetId);
   const deleteExpense = useDeleteExpense(budgetId);
 
   const [open, setOpen] = useState(false);
+  const [localIsPaid, setLocalIsPaid] = useState(expense.is_paid);
   const [name, setName] = useState(expense.name);
   const [amount, setAmount] = useState(
     formatMinorUnitsForInput(expense.amount_pence),
@@ -53,7 +56,7 @@ export default function ExpenseTableRow({
   const [isPaid, setIsPaid] = useState(expense.is_paid);
 
   const isPending = mutateExpense.isPending || deleteExpense.isPending;
-  const canSave = !isPending && Boolean(budget) && Boolean(profile);
+  const canSave = !isPending;
   const categoryLabel =
     CategorySelectOptions.find((option) => option.value === expense.category)
       ?.label ?? expense.category;
@@ -63,7 +66,7 @@ export default function ExpenseTableRow({
     setAmount(formatMinorUnitsForInput(expense.amount_pence));
     setPaymentDay(Number(expense.payment_date.slice(-2)));
     setCategory(expense.category);
-    setIsPaid(expense.is_paid);
+    setIsPaid(localIsPaid);
   };
 
   return (
@@ -80,14 +83,36 @@ export default function ExpenseTableRow({
       <TableRow>
         <TableCell className="w-10">
           <Checkbox
-            checked={expense.is_paid}
+            checked={localIsPaid}
             disabled={isPending}
-            onCheckedChange={() =>
-              mutateExpense.mutate({
-                expenseId: expense.id,
-                patch: { is_paid: !expense.is_paid },
-              })
-            }
+            onCheckedChange={() => {
+              const previousIsPaid = localIsPaid;
+              const nextIsPaid = !previousIsPaid;
+              const deltaPence = nextIsPaid
+                ? -expense.amount_pence
+                : expense.amount_pence;
+
+              setLocalIsPaid(nextIsPaid);
+              setIsPaid(nextIsPaid);
+              onStillToPayDelta?.(deltaPence);
+
+              mutateExpense.mutate(
+                {
+                  expenseId: expense.id,
+                  patch: { is_paid: nextIsPaid },
+                },
+                {
+                  onError: () => {
+                    setLocalIsPaid(previousIsPaid);
+                    setIsPaid(previousIsPaid);
+                    onStillToPayDelta?.(-deltaPence);
+                  },
+                  onSettled: () => {
+                    router.refresh();
+                  },
+                },
+              );
+            }}
           />
         </TableCell>
         <TableCell colSpan={2} className="p-0">
@@ -122,7 +147,6 @@ export default function ExpenseTableRow({
           onSubmit={(e) => {
             e.preventDefault();
 
-            if (!budget || !profile) return;
             const amountPence = parseCurrencyToMinorUnits(amount);
             if (amountPence === null) return;
 
@@ -134,8 +158,8 @@ export default function ExpenseTableRow({
                   amount_pence: amountPence,
                   category,
                   payment_date: computePaymentDateForCycle({
-                    periodStart: budget.period_start,
-                    monthStartDay: profile.month_start_day,
+                    periodStart,
+                    monthStartDay,
                     paymentDay,
                   }),
                   is_paid: isPaid,
@@ -143,7 +167,9 @@ export default function ExpenseTableRow({
               },
               {
                 onSuccess: () => {
+                  setLocalIsPaid(isPaid);
                   setOpen(false);
+                  router.refresh();
                 },
               },
             );
@@ -174,6 +200,7 @@ export default function ExpenseTableRow({
                 deleteExpense.mutate(expense.id, {
                   onSuccess: () => {
                     setOpen(false);
+                    router.refresh();
                   },
                 })
               }
