@@ -9,7 +9,7 @@ import {
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChartContainer, type ChartConfig } from "@/components/ui/chart";
-import { H3, P } from "../ui";
+import { AnimatedNumber, H3, P } from "../ui";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { BudgetSummary as BudgetSummaryData } from "@/lib/types/appTypes";
 
@@ -56,9 +56,10 @@ export function BudgetSummary({ budgetSummary }: BudgetSummaryProps) {
           </div>
           <div className="flex flex-col">
             <P isSubtext>Total expenses</P>
-            <H3 className="tabular-nums">
+            {/* <H3 className="tabular-nums">
               {formatCurrencyFromMinorUnits(expenseTotalPence)}
-            </H3>
+            </H3> */}
+            <AnimatedNumber content={expenseTotalPence / 100} />
           </div>
           <div className="flex flex-col">
             <P isSubtext>Still to pay</P>
