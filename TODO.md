@@ -11,6 +11,7 @@
 - Page loading component for `loading.tsx` files
 - Take a look at maybe refactoring `expense-row.sx`
 - Refactor `settings-form.tsx`
+- Make sure form fields DON'T try to autofill user contact info
 
 ## Needs more thought
 
@@ -21,3 +22,4 @@
 - Header section of `/budget`
 - Page error component
 - Add logout and delete account/data features
+- Hide the scrollbars?
