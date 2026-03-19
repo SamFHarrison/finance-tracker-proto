@@ -17,6 +17,7 @@ const CATEGORY_LABELS: Record<ExpenseCategory, string> = {
 
 const EXPENSE_CATEGORIES = Constants.public.Enums
   .expense_category as readonly ExpenseCategory[];
+export { EXPENSE_CATEGORIES };
 
 export const CategorySelectOptions: CategorySelectOption[] =
   EXPENSE_CATEGORIES.map((value) => ({

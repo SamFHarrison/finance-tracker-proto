@@ -1,6 +1,17 @@
 "use client";
 
-import { Button, H3, P, TableCell, TableRow } from "@/components/ui";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import {
+  Button,
+  FieldError,
+  H3,
+  P,
+  TableCell,
+  TableRow,
+} from "@/components/ui";
 import { formatCurrencyFromMinorUnits } from "@/lib/utils/formatCurrencyMinorUnits";
 import { IncomeRow } from "@/lib/supabase/types/types";
 import {
@@ -11,14 +22,15 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { useState } from "react";
-import { Spinner } from "../ui/spinner";
-import { useMutateIncome } from "@/lib/hooks/useMutateIncome";
 import { useDeleteIncome } from "@/lib/hooks/useDeleteIncome";
+import { useMutateIncome } from "@/lib/hooks/useMutateIncome";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
-import IncomeFormFields from "./income-form-fields";
-import { useRouter } from "next/navigation";
+import { Spinner } from "../ui/spinner";
+import IncomeFormFields, {
+  incomeFormSchema,
+  type IncomeFormValues,
+} from "./income-form-fields";
 
 type IncomeTableRowProps = {
   income: IncomeRow;
@@ -32,21 +44,28 @@ export default function IncomeTableRow({
   const router = useRouter();
   const mutateIncome = useMutateIncome(budgetId);
   const deleteIncome = useDeleteIncome(budgetId);
-
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState(income.name);
-  const [amount, setAmount] = useState(
-    formatMinorUnitsForInput(income.amount_pence),
-  );
-  const [isMonthly, setIsMonthly] = useState(income.is_monthly);
-
-  const isPending = mutateIncome.isPending || deleteIncome.isPending;
-
-  const resetForm = () => {
-    setName(income.name);
-    setAmount(formatMinorUnitsForInput(income.amount_pence));
-    setIsMonthly(income.is_monthly);
-  };
+  const getDefaultValues = (): IncomeFormValues => ({
+    name: income.name,
+    amount: formatMinorUnitsForInput(income.amount_pence),
+    isMonthly: income.is_monthly,
+  });
+  const {
+    clearErrors,
+    control,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+    reset,
+    setError,
+    setValue,
+  } = useForm<IncomeFormValues>({
+    resolver: zodResolver(incomeFormSchema),
+    defaultValues: getDefaultValues(),
+  });
+  const name = useWatch({ control, name: "name" }) ?? "";
+  const amount = useWatch({ control, name: "amount" }) ?? "";
+  const isPending =
+    mutateIncome.isPending || deleteIncome.isPending || isSubmitting;
 
   return (
     <Dialog
@@ -55,8 +74,11 @@ export default function IncomeTableRow({
         setOpen(nextOpen);
 
         if (nextOpen) {
-          resetForm();
+          reset(getDefaultValues());
+          return;
         }
+
+        clearErrors();
       }}
     >
       <TableRow>
@@ -86,46 +108,68 @@ export default function IncomeTableRow({
         </DialogHeader>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
+          onSubmit={handleSubmit(async (values) => {
+            clearErrors("root");
 
-            const amountPence = parseCurrencyToMinorUnits(amount);
-            if (amountPence === null) return;
+            const amountPence = parseCurrencyToMinorUnits(values.amount);
+            if (amountPence === null) {
+              setError("amount", {
+                type: "validate",
+                message: "Enter a valid amount.",
+              });
+              return;
+            }
 
-            mutateIncome.mutate(
-              {
+            try {
+              await mutateIncome.mutateAsync({
                 incomeId: income.id,
                 patch: {
-                  name,
+                  name: values.name.trim(),
                   amount_pence: amountPence,
-                  is_monthly: isMonthly,
+                  is_monthly: values.isMonthly,
                 },
-              },
-              {
-                onSuccess: () => {
-                  setOpen(false);
-                  router.refresh();
-                },
-              },
-            );
-          }}
+              });
+              setOpen(false);
+              router.refresh();
+            } catch (error: unknown) {
+              setError("root", {
+                type: "server",
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to save income.",
+              });
+            }
+          })}
         >
           <IncomeFormFields
             idPrefix={`income-${income.id}`}
-            name={name}
-            amount={amount}
-            isMonthly={isMonthly}
+            control={control}
+            errors={errors}
+            values={{ name, amount }}
             disabled={isPending}
-            onNameChange={setName}
-            onAmountChange={setAmount}
-            onIsMonthlyChange={setIsMonthly}
+            onNameChange={(value) =>
+              setValue("name", value, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
+            onAmountChange={(value) =>
+              setValue("amount", value, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
           />
+          <FieldError>{errors.root?.message}</FieldError>
 
-          <DialogFooter className="flex-row">
+          <DialogFooter className="mt-4 flex-row">
             <Button
               type="button"
               variant="destructive"
-              className="w-full mt-4 shrink"
+              className="w-full shrink"
               disabled={isPending}
               onClick={() =>
                 deleteIncome.mutate(income.id, {
@@ -141,7 +185,7 @@ export default function IncomeTableRow({
             </Button>
             <Button
               type="submit"
-              className="w-full mt-4 shrink"
+              className="w-full shrink"
               disabled={isPending}
             >
               {mutateIncome.isPending && <Spinner />}

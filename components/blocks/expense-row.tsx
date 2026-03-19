@@ -1,8 +1,19 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button, Checkbox, H3, P, TableCell, TableRow } from "@/components/ui";
-import { CategorySelectOptions, ExpenseCategory } from "@/lib/contants";
+import { useForm, useWatch } from "react-hook-form";
+import {
+  Button,
+  Checkbox,
+  FieldError,
+  H3,
+  P,
+  TableCell,
+  TableRow,
+} from "@/components/ui";
+import { CategorySelectOptions } from "@/lib/contants";
 import { useDeleteExpense } from "@/lib/hooks/useDeleteExpense";
 import { ExpenseRow } from "@/lib/supabase/types/types";
 import { useMutateExpense } from "@/lib/hooks/useMutateExpense";
@@ -20,8 +31,10 @@ import {
 import { Spinner } from "../ui/spinner";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
 import { formatMinorUnitsForInput } from "@/lib/utils/formatMinorUnitsForInput";
-import ExpenseFormFields from "./expense-form-fields";
-import { useRouter } from "next/navigation";
+import ExpenseFormFields, {
+  expenseFormSchema,
+  type ExpenseFormValues,
+} from "./expense-form-fields";
 
 type ExpenseTableRowProps = {
   budgetId: string;
@@ -45,29 +58,33 @@ export default function ExpenseTableRow({
 
   const [open, setOpen] = useState(false);
   const [localIsPaid, setLocalIsPaid] = useState(expense.is_paid);
-  const [name, setName] = useState(expense.name);
-  const [amount, setAmount] = useState(
-    formatMinorUnitsForInput(expense.amount_pence),
-  );
-  const [paymentDay, setPaymentDay] = useState(
-    Number(expense.payment_date.slice(-2)),
-  );
-  const [category, setCategory] = useState<ExpenseCategory>(expense.category);
-  const [isPaid, setIsPaid] = useState(expense.is_paid);
-
-  const isPending = mutateExpense.isPending || deleteExpense.isPending;
+  const getDefaultValues = (): ExpenseFormValues => ({
+    name: expense.name,
+    amount: formatMinorUnitsForInput(expense.amount_pence),
+    paymentDay: Number(expense.payment_date.slice(-2)),
+    category: expense.category,
+    isPaid: localIsPaid,
+  });
+  const {
+    clearErrors,
+    control,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+    reset,
+    setError,
+    setValue,
+  } = useForm<ExpenseFormValues>({
+    resolver: zodResolver(expenseFormSchema),
+    defaultValues: getDefaultValues(),
+  });
+  const name = useWatch({ control, name: "name" }) ?? "";
+  const amount = useWatch({ control, name: "amount" }) ?? "";
+  const isPending =
+    mutateExpense.isPending || deleteExpense.isPending || isSubmitting;
   const canSave = !isPending;
   const categoryLabel =
     CategorySelectOptions.find((option) => option.value === expense.category)
       ?.label ?? expense.category;
-
-  const resetForm = () => {
-    setName(expense.name);
-    setAmount(formatMinorUnitsForInput(expense.amount_pence));
-    setPaymentDay(Number(expense.payment_date.slice(-2)));
-    setCategory(expense.category);
-    setIsPaid(localIsPaid);
-  };
 
   return (
     <Dialog
@@ -76,8 +93,11 @@ export default function ExpenseTableRow({
         setOpen(nextOpen);
 
         if (nextOpen) {
-          resetForm();
+          reset(getDefaultValues());
+          return;
         }
+
+        clearErrors();
       }}
     >
       <TableRow>
@@ -93,7 +113,6 @@ export default function ExpenseTableRow({
                 : expense.amount_pence;
 
               setLocalIsPaid(nextIsPaid);
-              setIsPaid(nextIsPaid);
               onStillToPayDelta?.(deltaPence);
 
               mutateExpense.mutate(
@@ -104,7 +123,6 @@ export default function ExpenseTableRow({
                 {
                   onError: () => {
                     setLocalIsPaid(previousIsPaid);
-                    setIsPaid(previousIsPaid);
                     onStillToPayDelta?.(-deltaPence);
                   },
                   onSettled: () => {
@@ -144,57 +162,76 @@ export default function ExpenseTableRow({
         </DialogHeader>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
+          onSubmit={handleSubmit(async (values) => {
+            clearErrors("root");
 
-            const amountPence = parseCurrencyToMinorUnits(amount);
-            if (amountPence === null) return;
+            const amountPence = parseCurrencyToMinorUnits(values.amount);
+            if (amountPence === null) {
+              setError("amount", {
+                type: "validate",
+                message: "Enter a valid amount.",
+              });
+              return;
+            }
 
-            mutateExpense.mutate(
-              {
+            try {
+              await mutateExpense.mutateAsync({
                 expenseId: expense.id,
                 patch: {
-                  name,
+                  name: values.name.trim(),
                   amount_pence: amountPence,
-                  category,
+                  category: values.category,
                   payment_date: computePaymentDateForCycle({
                     periodStart,
                     monthStartDay,
-                    paymentDay,
+                    paymentDay: values.paymentDay,
                   }),
-                  is_paid: isPaid,
+                  is_paid: values.isPaid,
                 },
-              },
-              {
-                onSuccess: () => {
-                  setLocalIsPaid(isPaid);
-                  setOpen(false);
-                  router.refresh();
-                },
-              },
-            );
-          }}
+              });
+              setLocalIsPaid(values.isPaid);
+              setOpen(false);
+              router.refresh();
+            } catch (error: unknown) {
+              setError("root", {
+                type: "server",
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to save expense.",
+              });
+            }
+          })}
         >
           <ExpenseFormFields
             idPrefix={`expense-${expense.id}`}
-            name={name}
-            amount={amount}
-            paymentDay={paymentDay}
-            category={category}
-            isPaid={isPaid}
+            control={control}
+            errors={errors}
+            values={{ name, amount }}
             disabled={isPending}
-            onNameChange={setName}
-            onAmountChange={setAmount}
-            onPaymentDayChange={setPaymentDay}
-            onCategoryChange={setCategory}
-            onIsPaidChange={setIsPaid}
+            showIsPaidToggle
+            onNameChange={(value) =>
+              setValue("name", value, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
+            onAmountChange={(value) =>
+              setValue("amount", value, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
           />
+          <FieldError>{errors.root?.message}</FieldError>
 
-          <DialogFooter className="flex-row">
+          <DialogFooter className="mt-4 flex-row">
             <Button
               type="button"
               variant="destructive"
-              className="w-full mt-4 shrink"
+              className="w-full shrink"
               disabled={isPending}
               onClick={() =>
                 deleteExpense.mutate(expense.id, {
@@ -208,11 +245,7 @@ export default function ExpenseTableRow({
               {deleteExpense.isPending && <Spinner />}
               {deleteExpense.isPending ? "Deleting..." : "Delete"}
             </Button>
-            <Button
-              type="submit"
-              className="w-full mt-4 shrink"
-              disabled={!canSave}
-            >
+            <Button type="submit" className="w-full shrink" disabled={!canSave}>
               {mutateExpense.isPending && <Spinner />}
               {mutateExpense.isPending ? "Saving..." : "Save"}
             </Button>

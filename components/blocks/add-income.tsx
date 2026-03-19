@@ -1,5 +1,8 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -8,32 +11,54 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Plus } from "lucide-react";
-import { Button } from "../ui";
-import { useCreateIncome } from "@/lib/hooks/useCreateIncome";
 import { useState } from "react";
-import { Spinner } from "../ui/spinner";
+import { useForm, useWatch } from "react-hook-form";
+import { useCreateIncome } from "@/lib/hooks/useCreateIncome";
 import { parseCurrencyToMinorUnits } from "@/lib/utils/parseCurrencyToMinorUnits";
-import IncomeFormFields from "./income-form-fields";
-import { useRouter } from "next/navigation";
+import { Button, FieldError } from "../ui";
+import { Spinner } from "../ui/spinner";
+import IncomeFormFields, {
+  incomeFormSchema,
+  type IncomeFormValues,
+} from "./income-form-fields";
+
+const ADD_INCOME_DEFAULT_VALUES: IncomeFormValues = {
+  name: "",
+  amount: "",
+  isMonthly: false,
+};
 
 export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
   const router = useRouter();
   const createIncome = useCreateIncome(budgetId);
-
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [isMonthly, setIsMonthly] = useState(false);
-
-  const resetForm = () => {
-    setName("");
-    setAmount("");
-    setIsMonthly(false);
-  };
+  const {
+    clearErrors,
+    control,
+    formState: { errors, isSubmitting },
+    handleSubmit,
+    reset,
+    setError,
+    setValue,
+  } = useForm<IncomeFormValues>({
+    resolver: zodResolver(incomeFormSchema),
+    defaultValues: ADD_INCOME_DEFAULT_VALUES,
+  });
+  const name = useWatch({ control, name: "name" }) ?? "";
+  const amount = useWatch({ control, name: "amount" }) ?? "";
+  const isPending = createIncome.isPending || isSubmitting;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+
+        if (!nextOpen) {
+          clearErrors();
+        }
+      }}
+    >
       <DialogTrigger
         render={
           <Button variant="ghost" size="icon-lg">
@@ -47,50 +72,68 @@ export default function AddIncomeForm({ budgetId }: { budgetId: string }) {
         </DialogHeader>
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
+          onSubmit={handleSubmit(async (values) => {
+            clearErrors("root");
 
-            const amountPence = parseCurrencyToMinorUnits(amount);
-            if (amountPence === null) return;
+            const amountPence = parseCurrencyToMinorUnits(values.amount);
+            if (amountPence === null) {
+              setError("amount", {
+                type: "validate",
+                message: "Enter a valid amount.",
+              });
+              return;
+            }
 
-            createIncome.mutate(
-              {
+            try {
+              await createIncome.mutateAsync({
                 budget_id: budgetId,
-                name,
+                name: values.name.trim(),
                 amount_pence: amountPence,
-                is_monthly: isMonthly,
-              },
-              {
-                onSuccess: () => {
-                  resetForm();
-                  setOpen(false);
-                  router.refresh();
-                },
-              },
-            );
-          }}
+                is_monthly: values.isMonthly,
+              });
+              reset(ADD_INCOME_DEFAULT_VALUES);
+              setOpen(false);
+              router.refresh();
+            } catch (error: unknown) {
+              setError("root", {
+                type: "server",
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : "Unable to add income.",
+              });
+            }
+          })}
         >
           <IncomeFormFields
             idPrefix="add-income"
-            name={name}
-            amount={amount}
-            isMonthly={isMonthly}
-            disabled={createIncome.isPending}
+            control={control}
+            errors={errors}
+            values={{ name, amount }}
+            disabled={isPending}
             namePlaceholder="Rent"
             amountRequired
-            onNameChange={setName}
-            onAmountChange={setAmount}
-            onIsMonthlyChange={setIsMonthly}
+            onNameChange={(value) =>
+              setValue("name", value, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
+            onAmountChange={(value) =>
+              setValue("amount", value, {
+                shouldDirty: true,
+                shouldTouch: true,
+                shouldValidate: true,
+              })
+            }
           />
+          <FieldError>{errors.root?.message}</FieldError>
 
-          <DialogFooter className="flex-row">
-            <Button
-              type="submit"
-              className="w-full mt-4"
-              disabled={createIncome.isPending}
-            >
-              {createIncome.isPending && <Spinner />}
-              {createIncome.isPending ? "Saving..." : "Save"}
+          <DialogFooter className="mt-4 flex-row">
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending && <Spinner />}
+              {isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>
