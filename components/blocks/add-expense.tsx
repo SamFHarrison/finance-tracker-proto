@@ -103,6 +103,7 @@ export default function AddExpenseForm({
                 name: values.name.trim(),
                 amount_pence: amountPence,
                 category: values.category,
+                payment_day: values.paymentDay,
                 payment_date: computePaymentDateForCycle({
                   periodStart,
                   monthStartDay,

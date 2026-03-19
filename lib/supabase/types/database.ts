@@ -64,6 +64,7 @@ export type Database = {
           id: string
           is_paid: boolean
           name: string
+          payment_day: number
           payment_date: string
         }
         Insert: {
@@ -74,6 +75,7 @@ export type Database = {
           id?: string
           is_paid?: boolean
           name: string
+          payment_day: number
           payment_date: string
         }
         Update: {
@@ -84,6 +86,7 @@ export type Database = {
           id?: string
           is_paid?: boolean
           name?: string
+          payment_day?: number
           payment_date?: string
         }
         Relationships: [
@@ -419,4 +422,3 @@ export const Constants = {
     },
   },
 } as const
-

@@ -61,7 +61,7 @@ export default function ExpenseTableRow({
   const getDefaultValues = (): ExpenseFormValues => ({
     name: expense.name,
     amount: formatMinorUnitsForInput(expense.amount_pence),
-    paymentDay: Number(expense.payment_date.slice(-2)),
+    paymentDay: expense.payment_day,
     category: expense.category,
     isPaid: localIsPaid,
   });
@@ -181,6 +181,7 @@ export default function ExpenseTableRow({
                   name: values.name.trim(),
                   amount_pence: amountPence,
                   category: values.category,
+                  payment_day: values.paymentDay,
                   payment_date: computePaymentDateForCycle({
                     periodStart,
                     monthStartDay,
